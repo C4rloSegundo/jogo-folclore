@@ -65,11 +65,11 @@ animations = [{
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d7x0g"]
-radius = 75.0
-height = 296.0
+radius = 28.551502
+height = 167.48581
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_klq5n"]
-size = Vector2(146, 289)
+size = Vector2(61.225555, 213.85522)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
 size = Vector2(44.7993, 82.1753)
@@ -77,7 +77,6 @@ size = Vector2(44.7993, 82.1753)
 [node name="inimigos" type="Node2D"]
 position = Vector2(2, -67)
 scale = Vector2(0.326661, 0.346298)
-metadata/_edit_group_ = true
 
 [node name="soldado" type="CharacterBody2D" parent="." groups=["inimigos"]]
 position = Vector2(-7.29866e-07, 0)
@@ -87,13 +86,14 @@ motion_mode = 1
 script = ExtResource("1_klq5n")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="soldado"]
-position = Vector2(18.3677, 0)
+position = Vector2(-1.9073486e-06, 0)
+scale = Vector2(0.497, 0.497)
 sprite_frames = SubResource("SpriteFrames_0tcue")
-animation = &"morrendo"
+animation = &"andar"
 autoplay = "andar"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado"]
-position = Vector2(-1, 12)
+position = Vector2(8.34465e-07, -2.887683)
 shape = SubResource("CapsuleShape2D_d7x0g")
 
 [node name="detector_parede" type="RayCast2D" parent="soldado"]
@@ -109,12 +109,15 @@ collision_layer = 16
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/Hurtbox"]
-position = Vector2(-1, 11.5)
+position = Vector2(3.8146973e-06, -26.072388)
+scale = Vector2(1.0000001, 1)
 shape = SubResource("RectangleShape2D_klq5n")
 
 [node name="HitboxDano" type="Area2D" parent="soldado"]
+visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/HitboxDano"]
+visible = false
 position = Vector2(1.53063, 14.4384)
 scale = Vector2(3.34832, 3.65462)
 shape = SubResource("RectangleShape2D_8pes2")
