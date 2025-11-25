@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://b5nl8qhpdnjn8"]
+[gd_scene load_steps=13 format=3 uid="uid://b5nl8qhpdnjn8"]
 
 [ext_resource type="Script" uid="uid://fhk3w0yjmyn8" path="res://demofloresta.gd" id="1_euhhy"]
 [ext_resource type="Texture2D" uid="uid://dtry2efxjaal2" path="res://assets/cenario/cenario2d.png" id="1_r176x"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://t0jodcsay6t8" path="res://personagem.tscn" id="3_b676b"]
 [ext_resource type="PackedScene" uid="uid://xglyfkoqg2ou" path="res://inimigos.tscn" id="4_ncleg"]
 [ext_resource type="Texture2D" uid="uid://ngjt1i6r300j" path="res://assets/cenario/background.jpg" id="5_5rnve"]
+[ext_resource type="PackedScene" uid="uid://d3d8ifa4ywumy" path="res://hud.tscn" id="7_lnard"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_b676b"]
 
@@ -895,21 +896,31 @@ layer_0/tile_data = PackedInt32Array(983057, 0, 21, 1114129, 65536, 22, 983058, 
 [node name="personagem" parent="." instance=ExtResource("3_b676b")]
 position = Vector2(600, 204)
 
+[node name="Sprite" parent="personagem/curumin" index="0"]
+position = Vector2(19, 14)
+
+[node name="colisão" parent="personagem/curumin" index="1"]
+position = Vector2(44, 45.25)
+
 [node name="inimigos" parent="." instance=ExtResource("4_ncleg")]
-position = Vector2(1220, 236)
+position = Vector2(1226, 269)
+
+[node name="inimigos3" parent="." instance=ExtResource("4_ncleg")]
+position = Vector2(1174, 266)
 
 [node name="inimigos2" parent="." instance=ExtResource("4_ncleg")]
 position = Vector2(1652, 243)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+visible = false
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_mirroring = Vector2(640, 0)
 
 [node name="TextureRect" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
-offset_left = -64.0
+offset_left = -85.0
 offset_top = -430.0
-offset_right = 1604.0
+offset_right = 1583.0
 offset_bottom = 581.0
 texture = ExtResource("5_5rnve")
 
@@ -919,4 +930,10 @@ texture = ExtResource("5_5rnve")
 position = Vector2(1587, 407)
 shape = SubResource("RectangleShape2D_euhhy")
 
+[node name="hud" parent="." instance=ExtResource("7_lnard")]
+
+[connection signal="saude_mudou" from="personagem/curumin" to="hud/ContainerCoracoes" method="_on_curumin_saude_mudou"]
 [connection signal="body_entered" from="ZonaDeMorte" to="." method="_on_zona_de_morte_body_entered"]
+
+[editable path="personagem"]
+[editable path="hud"]

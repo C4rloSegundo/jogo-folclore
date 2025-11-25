@@ -69,13 +69,13 @@ radius = 28.551502
 height = 167.48581
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_klq5n"]
-size = Vector2(61.225555, 213.85522)
+size = Vector2(61.225555, 147.272)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
 size = Vector2(44.7993, 82.1753)
 
 [node name="inimigos" type="Node2D"]
-position = Vector2(2, -67)
+position = Vector2(2, -27)
 scale = Vector2(0.326661, 0.346298)
 
 [node name="soldado" type="CharacterBody2D" parent="." groups=["inimigos"]]
@@ -109,7 +109,7 @@ collision_layer = 16
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/Hurtbox"]
-position = Vector2(3.8146973e-06, -26.072388)
+position = Vector2(9.536743e-07, 4.3315353)
 scale = Vector2(1.0000001, 1)
 shape = SubResource("RectangleShape2D_klq5n")
 
