@@ -1,11 +1,17 @@
 extends CharacterBody2D
 
+
 # --- Configurações de Movimento (PADRÃO NOVO) ---
 @export var speed: float = 40.0    # Velocidade reduzida
 @export var gravity: float = 100.0 # Gravidade muito leve (flutuante)
 @export var tempo_patrulha: float = 3.0 
 
-var direction: int = -1 
+# --- Variáveis de Patrulha ---
+
+var direction = -1     # Começa andando para a esquerda
+
+
+
 var timer_patrulha: Timer
 var player_alvo: Node2D = null # Variável para guardar o jogador detectado
 
