@@ -96,7 +96,7 @@ script = ExtResource("1_k0c8s")
 position = Vector2(0, 3.0000014)
 scale = Vector2(0.25263157, 0.25128204)
 sprite_frames = SubResource("SpriteFrames_87qvo")
-animation = &"atacando"
+animation = &"pulando"
 centered = false
 
 [node name="colisão" type="CollisionShape2D" parent="curumin"]
@@ -125,19 +125,8 @@ one_shot = true
 [node name="PontoTiro" type="Marker2D" parent="curumin"]
 position = Vector2(31, 19)
 
-[node name="ParticulaPulo" type="CPUParticles2D" parent="curumin"]
-emitting = false
-amount = 15
-lifetime = 0.5
-one_shot = true
-explosiveness = 1.0
-direction = Vector2(0, 1)
-spread = 90.0
-gravity = Vector2(0, 0)
-initial_velocity_min = 50.0
-initial_velocity_max = 100.0
-scale_amount_min = 5.0
-scale_amount_max = 5.0
+[node name="PontoEfeitoPulo" type="Marker2D" parent="curumin"]
+position = Vector2(14, 44)
 
 [connection signal="body_entered" from="curumin/Hitboxataque" to="curumin" method="_on_hitbox_ataque_area_entered"]
 [connection signal="timeout" from="curumin/TimerInvencibilidade" to="curumin" method="_on_timer_invencibilidade_timeout"]
