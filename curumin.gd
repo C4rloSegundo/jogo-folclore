@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 # --- Constantes ---
 const VELOCIDADE_ANDAR: float = 150.0
-const FORCA_PULO: float = -300.0
+const FORCA_PULO: float = -310.0
 const GRAVIDADE: float = 400.0
 
 # PRELOADS (Cenas Externas)
@@ -155,7 +155,7 @@ func levar_dano(dano: int):
 	else: iniciar_invencibilidade()
 
 func morrer():
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://tela_de_morte.tscn")
 
 func iniciar_invencibilidade():
 	esta_invencivel = true
@@ -169,3 +169,11 @@ func _on_timer_invencibilidade_timeout() -> void:
 func _on_hitbox_ataque_area_entered(body): 
 	if body != self and body.has_method("levar_dano"):
 		body.levar_dano(1)
+# --- NOVA FUNÇÃO DE CURA ---
+func curar_total():
+	vida_atual = vida_max
+	saude_mudou.emit(vida_atual) # Atualiza os corações na tela
+	
+	# Salva a posição atual (Checkpoint)
+	ultimo_checkpoint_pos = global_position
+	print("Vida recuperada e Checkpoint Salvo!")

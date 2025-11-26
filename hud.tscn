@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://d3d8ifa4ywumy"]
+[gd_scene load_steps=4 format=3 uid="uid://d3d8ifa4ywumy"]
 
+[ext_resource type="Script" uid="uid://d0d3h1g0q1lo0" path="res://hud.gd" id="1_8sq4i"]
 [ext_resource type="Script" uid="uid://dfkp6y6fmc50o" path="res://container_coracoes.gd" id="1_64ctp"]
 [ext_resource type="Texture2D" uid="uid://db3ro0cynr83e" path="res://assets/hud/image-removebg-preview (1).png" id="2_8sq4i"]
 
 [node name="hud" type="CanvasLayer"]
+script = ExtResource("1_8sq4i")
 
 [node name="ContainerCoracoes" type="HBoxContainer" parent="."]
 offset_right = 377.0
@@ -21,3 +23,16 @@ texture = ExtResource("2_8sq4i")
 [node name="Coracao3" type="TextureRect" parent="ContainerCoracoes"]
 layout_mode = 2
 texture = ExtResource("2_8sq4i")
+
+[node name="LabelTempo" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 0.032
+offset_left = -112.0
+offset_bottom = 55.264
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 49
+text = "00:00"
+
+[node name="TimerFase" type="Timer" parent="."]
