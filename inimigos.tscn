@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://xglyfkoqg2ou"]
+[gd_scene load_steps=15 format=3 uid="uid://xglyfkoqg2ou"]
 
 [ext_resource type="Script" uid="uid://cjy8dg6mewkky" path="res://soldado.gd" id="1_klq5n"]
 [ext_resource type="Texture2D" uid="uid://l4j0fjf215jt" path="res://assets/inimigos/soldado andando-Photoroom.png" id="2_8pes2"]
@@ -74,6 +74,9 @@ size = Vector2(61.225555, 147.272)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
 size = Vector2(44.7993, 82.1753)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_8pes2"]
+radius = 173.15584
+
 [node name="inimigos" type="Node2D"]
 position = Vector2(2, -27)
 scale = Vector2(0.326661, 0.346298)
@@ -84,7 +87,6 @@ collision_layer = 17
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_klq5n")
-gravity = 10.0
 
 [node name="Sprite" type="AnimatedSprite2D" parent="soldado"]
 position = Vector2(-1.9073486e-06, 0)
@@ -122,3 +124,13 @@ visible = false
 position = Vector2(1.53063, 14.4384)
 scale = Vector2(3.34832, 3.65462)
 shape = SubResource("RectangleShape2D_8pes2")
+
+[node name="Detector" type="Area2D" parent="soldado"]
+collision_layer = 7
+collision_mask = 7
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/Detector"]
+shape = SubResource("CircleShape2D_8pes2")
+
+[connection signal="body_entered" from="soldado/Detector" to="soldado" method="_on_detector_body_entered"]
+[connection signal="body_exited" from="soldado/Detector" to="soldado" method="_on_detector_body_exited"]
