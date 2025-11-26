@@ -95,6 +95,7 @@ func _physics_process(delta: float):
 
 # --- FUNÇÃO NOVA: CRIA O EFEITO VISUAL ---
 # --- FUNÇÃO ATUALIZADA: CRIA O EFEITO NO MARKER ---
+
 func criar_efeito_pulo():
 	# Verifica se a cena e o ponto existem
 	if not CENA_EFEITO_PULO or not ponto_efeito_pulo:
@@ -113,7 +114,24 @@ func criar_efeito_pulo():
 	
 	# 3. Adiciona à cena principal
 	get_parent().add_child(efeito)
+"""
+func criar_efeito_pulo():
+	if not CENA_EFEITO_PULO or not ponto_efeito_pulo:
+		return
 
+	var efeito = CENA_EFEITO_PULO.instantiate()
+	
+	# 1. NÃO usa top_level (assim ele fica preso ao jogador)
+	# efeito.top_level = true <-- REMOVIDO
+	
+	# 2. Define a posição RELATIVA ao jogador
+	# Como vamos adicionar como filho do jogador, usamos 'position' e não 'global_position'
+	# Queremos que ele fique exatamente onde está o Marker2D (relativo ao corpo)
+	efeito.position = ponto_efeito_pulo.position
+	
+	# 3. Adiciona COMO FILHO DO JOGADOR (add_child no self)
+	add_child(efeito)
+	"""
 # --- Função chamada pelo Saci ---
 func desbloquear_pulo_duplo():
 	tem_pulo_duplo = true
