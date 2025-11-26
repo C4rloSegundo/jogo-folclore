@@ -909,7 +909,7 @@ position = Vector2(1226, 269)
 position = Vector2(1174, 266)
 
 [node name="inimigos2" parent="." instance=ExtResource("4_ncleg")]
-position = Vector2(1652, 243)
+position = Vector2(1651.9999, 273)
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 visible = false
