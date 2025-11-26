@@ -1,0 +1,103 @@
+[gd_scene load_steps=15 format=3 uid="uid://bs73fca50r7pm"]
+
+[ext_resource type="Script" uid="uid://byyxupuvos3hf" path="res://bola_de_fogo.gd" id="1_gu3bg"]
+[ext_resource type="Texture2D" uid="uid://d2wjenb6x8b0n" path="res://assets/poderes/Jumping_Small_Fireball_14x45.png" id="1_l3gnx"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_aketx"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(0, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ib1n5"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(14, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_652he"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(28, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6l054"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(42, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hsxvf"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(56, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mk5ld"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(70, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sc0ox"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(84, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_si7h1"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(98, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_84x8a"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(112, 41, 14, 41)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h71qt"]
+atlas = ExtResource("1_l3gnx")
+region = Rect2(126, 41, 14, 41)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6n15b"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_aketx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ib1n5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_652he")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6l054")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hsxvf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mk5ld")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sc0ox")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_si7h1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_84x8a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h71qt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fornr"]
+size = Vector2(31, 7)
+
+[node name="BolaDeFogo" type="Area2D"]
+z_index = 10
+script = ExtResource("1_gu3bg")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+rotation = 1.5707964
+sprite_frames = SubResource("SpriteFrames_6n15b")
+autoplay = "default"
+frame_progress = 0.048885804
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_fornr")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

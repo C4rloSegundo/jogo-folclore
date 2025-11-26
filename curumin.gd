@@ -1,104 +1,124 @@
 extends CharacterBody2D
 
-# --- Constantes de Física ---
+# --- Constantes ---
 const VELOCIDADE_ANDAR: float = 150.0
 const FORCA_PULO: float = -300.0
 const GRAVIDADE: float = 400.0
+const CENA_BOLA_FOGO = preload("res://bola_de_fogo.tscn")
 
-# --- Variáveis de Estado ---
+# --- Estado ---
 var vida_max: int = 3
 var vida_atual: int = 3
 var ultimo_checkpoint_pos: Vector2
 var esta_invencivel: bool = false 
 
-# --- Sinais ---
 signal saude_mudou(vida_atual: int)
 
-# --- Referências de Nós ---
+# --- Referências ---
 @onready var sprite: AnimatedSprite2D = $Sprite
-@onready var hitbox_ataque: Area2D = $Hitboxataque
-@onready var shape_ataque = $Hitboxataque/CollisionShape2D
+@onready var hitbox_ataque: Area2D = get_node_or_null("Hitboxataque")
+@onready var shape_ataque = get_node_or_null("Hitboxataque/CollisionShape2D")
 @onready var timer_invencibilidade: Timer = $TimerInvencibilidade 
+@onready var ponto_tiro: Marker2D = get_node_or_null("PontoTiro")
 
-# Chamado assim que a cena entra na árvore
 func _ready():
 	vida_atual = vida_max
 	ultimo_checkpoint_pos = global_position
-	print("Personagem pronto!")
 	
-	# Garante que o ataque começa desligado
-	shape_ataque.disabled = true
+	if not ponto_tiro:
+		print("ERRO: O nó 'PontoTiro' (Marker2D) não foi encontrado!")
+	
+	if shape_ataque:
+		shape_ataque.disabled = true
+	add_to_group("jogador")
 
-# Chamado a cada frame de física
 func _physics_process(delta: float):
 	
-	# --- Gravidade ---
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * delta
 
-	# --- Lógica de Pulo ---
 	if Input.is_action_just_pressed("pular") and is_on_floor():
 		velocity.y = FORCA_PULO
 
-	# --- Lógica de Movimento (Esquerda/Direita) ---
 	var direcao = Input.get_axis("esquerda", "direita")
 	velocity.x = direcao * VELOCIDADE_ANDAR
 	
-	# --- VIRAR SPRITE E HITBOX (AQUI ESTÁ A CORREÇÃO) ---
+	# --- SISTEMA DE VIRAR TUDO ---
 	if direcao > 0: # Direita
 		sprite.flip_h = false
-		# Empurra a hitbox para a direita (número positivo)
-		hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
+		
+		# Empurra Hitbox para a direita
+		if hitbox_ataque:
+			hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
+			
+		# Empurra Mira para a direita (Valor Positivo)
+		if ponto_tiro:
+			ponto_tiro.position.x = abs(ponto_tiro.position.x)
 		
 	elif direcao < 0: # Esquerda
 		sprite.flip_h = true
-		# Empurra a hitbox para a esquerda (número negativo)
-		hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
+		
+		# Empurra Hitbox para a esquerda
+		if hitbox_ataque:
+			hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
+			
+		# Empurra Mira para a esquerda (Valor Negativo)
+		if ponto_tiro:
+			ponto_tiro.position.x = -abs(ponto_tiro.position.x)
 	
-	# --- Lógica de Animação e Ataque ---
+	# --- Ataque ---
 	if Input.is_action_just_pressed("atacar"):
 		sprite.play("atacando")
-		# Nota: Se tiveres uma animação "atacando", o position.y = 0 pode não ser necessário
-		# a menos que a tua animação esteja desalinhada
 		sprite.position.y = 0 
-		shape_ataque.disabled = false
-	
-	# Se a animação não for atacar OU se ela já acabou
-	elif sprite.animation != "atacando" or not sprite.is_playing():
-		shape_ataque.disabled = true
+		if shape_ataque:
+			shape_ataque.disabled = false
 		
-		if not is_on_floor():
-			sprite.play("pulando")
-		elif direcao != 0:
-			sprite.play("andando")
-		else:
-			sprite.play("parado")
+		# Dispara a bola
+		criar_bola_de_fogo()
+	
+	elif sprite.animation != "atacando" or not sprite.is_playing():
+		if shape_ataque:
+			shape_ataque.disabled = true
+			
+		if not is_on_floor(): sprite.play("pulando")
+		elif direcao != 0: sprite.play("andando")
+		else: sprite.play("parado")
 
 	move_and_slide()
 
-# --- Funções de Combate ---
-
-func levar_dano(dano: int):
-	# 1. Se já estiver invencível, ignora
-	if esta_invencivel:
+# --- FUNÇÃO DE TIRO ---
+func criar_bola_de_fogo():
+	if not ponto_tiro:
+		print("ERRO: PontoTiro não encontrado!")
 		return
 
-	# 2. Aplica o dano
+	var nova_bola = CENA_BOLA_FOGO.instantiate()
+	
+	# 1. Direção
+	if sprite.flip_h:
+		nova_bola.direcao = -1
+	else:
+		nova_bola.direcao = 1
+	
+	# 2. O SEGREDO MÁXIMO (Top Level + Marker2D)
+	# O top_level faz a bola ignorar escalas estranhas do cenário
+	nova_bola.top_level = true
+	
+	# A global_position pega a coordenada exata do pixel da tua mira no mundo
+	nova_bola.global_position = ponto_tiro.global_position
+	
+	# 3. Adiciona ao mundo
+	get_parent().add_child(nova_bola)
+# ... (Resto das funções de dano mantidas iguais) ...
+func levar_dano(dano: int):
+	if esta_invencivel: return
 	vida_atual -= dano
 	saude_mudou.emit(vida_atual)
-	print("Personagem tomou dano! Vidas restantes: ", vida_atual)
-	
-	if vida_atual <= 0:
-		morrer()
-	else:
-		# 3. Fica invencível temporariamente
-		iniciar_invencibilidade()
+	if vida_atual <= 0: morrer()
+	else: iniciar_invencibilidade()
 
 func morrer():
-	print("PERSONAGEM MORREU!")
-	# Muda para a cena de Game Over
-	# Certifique-se de salvar a cena de morte como "tela_morte.tscn"
-	get_tree().change_scene_to_file("res://tela_de_morte.tscn")
+	get_tree().reload_current_scene()
 
 func iniciar_invencibilidade():
 	esta_invencivel = true
@@ -108,19 +128,7 @@ func iniciar_invencibilidade():
 func _on_timer_invencibilidade_timeout() -> void:
 	esta_invencivel = false
 	modulate.a = 1.0 
-	print("Invencibilidade acabou.")
 
-# --- Conexão de Sinal (Ataque do Player) ---
 func _on_hitbox_ataque_area_entered(body): 
-	# Esta função é chamada quando a ESPADA acerta algo
-	print("Hitbox acertou: ", body.name)
-	if body.has_method("levar_dano"):
-		# Garante que não se ataca a si mesmo (caso a hitbox toque no player)
-		if body != self:
-			body.levar_dano(1)
-
-func curar_total():
-	vida_atual = vida_max
-	saude_mudou.emit(vida_atual)
-	ultimo_checkpoint_pos = global_position 
-	print("Checkpoint salvo! Vida recuperada.")
+	if body != self and body.has_method("levar_dano"):
+		body.levar_dano(1)

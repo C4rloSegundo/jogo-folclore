@@ -96,7 +96,7 @@ script = ExtResource("1_k0c8s")
 position = Vector2(0, 3.0000014)
 scale = Vector2(0.25263157, 0.25128204)
 sprite_frames = SubResource("SpriteFrames_87qvo")
-animation = &"andando"
+animation = &"atacando"
 centered = false
 
 [node name="colisão" type="CollisionShape2D" parent="curumin"]
@@ -121,6 +121,9 @@ shape = SubResource("RectangleShape2D_7k68m")
 [node name="TimerInvencibilidade" type="Timer" parent="curumin"]
 wait_time = 0.5
 one_shot = true
+
+[node name="PontoTiro" type="Marker2D" parent="curumin"]
+position = Vector2(31, 19)
 
 [connection signal="body_entered" from="curumin/Hitboxataque" to="curumin" method="_on_hitbox_ataque_area_entered"]
 [connection signal="timeout" from="curumin/TimerInvencibilidade" to="curumin" method="_on_timer_invencibilidade_timeout"]

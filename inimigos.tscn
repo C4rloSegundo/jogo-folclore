@@ -114,7 +114,7 @@ script = ExtResource("1_klq5n")
 position = Vector2(-1.9073486e-06, 0)
 scale = Vector2(0.497, 0.497)
 sprite_frames = SubResource("SpriteFrames_0tcue")
-animation = &"atacando"
+animation = &"andar"
 autoplay = "andar"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado"]
