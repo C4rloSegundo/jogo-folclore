@@ -1,116 +1,137 @@
 extends CharacterBody2D
 
-# --- Variáveis de Patrulha ---
-@export var speed = 40.0
-var gravity = 100.0 # Define a gravidade para o inimigo
-var direction = -1     # Começa andando para a esquerda
+# --- Configurações ---
+@export var speed: float = 40.0
+@export var gravity: float = 10.0
+@export var tempo_patrulha: float = 3.0 
 
-# --- Variáveis de Combate ---
-var vida: int = 3 # O inimigo tem 3 pontos de vida
-var is_dead: bool = false # <-- NOVO: Adicione esta "trava"
+var direction: int = -1 
+var timer_patrulha: Timer
+var player_alvo: Node2D = null
 
-# --- Referências de Nós ---
+# --- Combate ---
+var vida: int = 3
+var is_dead: bool = false
+
+# --- Referências ---
 @onready var sprite: AnimatedSprite2D = $Sprite
-@onready var detector_parede: RayCast2D = $detector_parede
-@onready var detector_abismo: RayCast2D = $detector_abismo
+# O código vai procurar um nó chamado "Detector". 
+# Se mudaste o nome na cena, avisa no erro.
+@onready var detector: Area2D = $Detector 
 
-
-# --- Funções de Combate ---
-
-# Chamada pelo "Hurtbox" do inimigo quando for atingido
-func levar_dano2(dano: int):
-	vida -= dano
-	print("Inimigo tomou dano! Vida restante: ", vida)
+func _ready():
+	atualizar_visual()
 	
-	if vida <= 0:
-		morrer()
-func levar_dano(dano: int):
-	# Não pode levar dano se já estiver morto
-	if is_dead:
-		return
+	# --- 1. CRIAÇÃO DO TIMER (Patrulha) ---
+	timer_patrulha = Timer.new()
+	timer_patrulha.wait_time = tempo_patrulha
+	timer_patrulha.one_shot = false
+	timer_patrulha.autostart = true
+	timer_patrulha.timeout.connect(virar_por_tempo)
+	add_child(timer_patrulha)
+	
+	# --- 2. LIGAÇÃO AUTOMÁTICA DOS OLHOS ---
+	if detector:
+		# Limpa conexões antigas para evitar bugs
+		if detector.body_entered.is_connected(_on_detector_body_entered):
+			detector.body_entered.disconnect(_on_detector_body_entered)
+		if detector.area_entered.is_connected(_on_detector_area_entered):
+			detector.area_entered.disconnect(_on_detector_area_entered)
+			
+		# Liga detecção de CORPOS (CharacterBody2D)
+		detector.body_entered.connect(_on_detector_body_entered)
+		detector.body_exited.connect(_on_detector_body_exited)
 		
-	vida -= dano
-	print("Inimigo tomou dano! Vida restante: ", vida)
-	
-	if vida <= 0:
-		morrer()
+		# Liga detecção de ÁREAS (Caso o jogador seja um Area2D)
+		detector.area_entered.connect(_on_detector_area_entered)
+		detector.area_exited.connect(_on_detector_area_exited)
+		
+		print("SUCESSO: Olhos do inimigo ligados e prontos!")
+	else:
+		print("ERRO: Não encontrei o nó 'Detector' na cena do Inimigo!")
 
-func morrer2():
-	print("Inimigo derrotado!")
-	queue_free() # Remove o inimigo da cenafunc morrer()	# Se já chamamos 'morrer', não faça nada (evita bugs	if is_dead		retur	is_dead = tru	# 1. Pare toda a lógica de IA e físic	set_physics_process(false	# 2. Desligue as colisões para o jogador não bater nel	$CollisionShape2D.disabled = tru	$Hurtbox.disabled = true # Desliga a Area2	# 3. Toque a animação de mort	sprite.play("morrendo") # <-- Use o nome da sua animaçã	# 4. ESPERE a animação "morrendo" termina	await sprite.animation_finishe	# 5. Só DEPOIS que a animação terminar, remova o inimig	queue_free(# --- Lógica de Física (Patrulha) --
-# ✅ FUNÇÃO MORRER (ATUALIZADA)
-func morrer():
-	# Se já chamamos 'morrer', não faça nada (evita bugs)
-	if is_dead:
-		return
-	is_dead = true
-	
-	# 1. Pare toda a lógica de IA e física
-	set_physics_process(false)
-	
-	# 2. Desligue as colisões para o jogador não bater nele
-	$CollisionShape2D.disabled = true # Desliga a colisão do CORPO
-	
-	# ⬇️⬇️ A CORREÇÃO ESTÁ AQUI ⬇️⬇️
-	# Nós desabilitamos o CollisionShape2D que está DENTRO do Hurtbox
-	$Hurtbox/CollisionShape2D.disabled = true 
-	
-	# 3. Toque a animação de morte
-	sprite.play("morrendo") # <-- Use o nome da sua animação
-
-	# 4. ESPERE a animação "morrendo" terminar
-	await sprite.animation_finished
-	
-	# 5. Só DEPOIS que a animação terminar, remova o inimigo
-	queue_free()
-
-
-
-
+# --- Física ---
 func _physics_process(delta):
-	# 1. Aplicar Gravidade
-#	if not is_on_floor():
-#		velocity.y += gravity * delta
+	if is_dead: return
 
-	# 2. Lógica para Virar (Checar *antes* de mover)
-	
-	# Ajusta os sensores e o sprite para a direção atual
-	if direction == 1: # Indo para a direita
-		sprite.flip_h = false
-		detector_parede.target_position.x = 16 # Aponta o raio para a direita
-		detector_abismo.position.x = 16        # Move o raio para a borda direita
-	else: # Indo para a esquerda
-		sprite.flip_h = true
-		detector_parede.target_position.x = -16 # Aponta o raio para a esquerda
-		detector_abismo.position.x = -16       # Move o raio para a borda esquerda
+	if not is_on_floor():
+		velocity.y += gravity * delta
 
-	# 3. Checar Sensores e Mudar Direção
-	# Só vira se estiver no chão E (bater na parede OU não achar chão na frente)
-	if is_on_floor() and (detector_parede.is_colliding() or not detector_abismo.is_colliding()):
-		direction *= -1 # Inverte a direção (1 vira -1, -1 vira 1)
+	# Lógica de Perseguição vs Patrulha
+	if player_alvo != null:
+		# Perseguindo
+		var direcao_player = global_position.direction_to(player_alvo.global_position).x
+		if direcao_player > 0: direction = 1
+		else: direction = -1
+		
+		if not timer_patrulha.is_stopped(): timer_patrulha.stop()
+	else:
+		# Patrulhando
+		if timer_patrulha.is_stopped(): timer_patrulha.start()
 
-	# 4. Definir Velocidade Horizontal
 	velocity.x = speed * direction
-
-	# 5. Mover o Inimigo
+	atualizar_visual()
 	move_and_slide()
 
+func virar_por_tempo():
+	if player_alvo == null:
+		direction *= -1
 
-# --- Sinais Conectados (do guia_cena_soldado.md) ---
+func atualizar_visual():
+	if direction == 1: sprite.flip_h = false
+	else: sprite.flip_h = true
 
-# Esta função é conectada ao sinal "body_entered" da "HitboxDano"
-# Ela é chamada quando o Soldado TOCA no jogador
-func _on_hitbox_dano_body_entered(body):
-	# Verifica se o corpo que entrou está no grupo "jogador"
+# --- DETECÇÃO (A parte que estava a falhar) ---
+
+# 1. Se o Jogador for um CORPO (CharacterBody2D)
+func _on_detector_body_entered(body):
+	print("Inimigo viu um CORPO: ", body.name)
 	if body.is_in_group("jogador"):
-		# Chama a função "levar_dano" que existe no script do jogador
+		print("--> É O JOGADOR! ATACAR!")
+		player_alvo = body
+
+func _on_detector_body_exited(body):
+	if body == player_alvo:
+		player_alvo = null
+
+# 2. Se o Jogador for uma ÁREA (Area2D) ou Hitbox
+func _on_detector_area_entered(area):
+	print("Inimigo viu uma ÁREA: ", area.name)
+	var pai = area.get_parent()
+	
+	if area.is_in_group("jogador"):
+		player_alvo = area
+	elif pai.is_in_group("jogador"):
+		print("--> É O JOGADOR (via PAI da área)!")
+		player_alvo = pai
+
+func _on_detector_area_exited(area):
+	var pai = area.get_parent()
+	if area == player_alvo or pai == player_alvo:
+		player_alvo = null
+
+# --- Combate ---
+func levar_dano(dano: int):
+	if is_dead: return
+	vida -= dano
+	if vida <= 0: morrer()
+
+func morrer():
+	if is_dead: return
+	is_dead = true
+	set_physics_process(false)
+	timer_patrulha.stop()
+	velocity = Vector2.ZERO
+	$CollisionShape2D.set_deferred("disabled", true)
+	if has_node("Hurtbox/CollisionShape2D"):
+		$Hurtbox/CollisionShape2D.set_deferred("disabled", true)
+	sprite.play("morrendo")
+	await sprite.animation_finished
+	queue_free()
+
+func _on_hitbox_dano_body_entered(body):
+	if body.is_in_group("jogador") and body.has_method("levar_dano"):
 		body.levar_dano(1)
-
-
-# Esta função é conectada ao sinal "area_entered" da "Hurtbox"
-# Ela é chamada quando o Soldado é ATINGIDO pelo ataque do jogador
 func _on_hurtbox_area_entered(area):
-	# Verifica se a área que nos atingiu é a "HitboxAtaque" do jogador
-	# (O nome "HitboxAtaque" deve estar correto na cena do personagem)
 	if area.name == "HitboxAtaque":
-		levar_dano(1) # Chama a função de dano deste próprio script
+		levar_dano(1)

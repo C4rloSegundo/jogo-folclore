@@ -85,7 +85,7 @@ size = Vector2(20, 49)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7k68m"]
 size = Vector2(79.75, 70.5)
 
-[node name="personagem" type="Node2D"]
+[node name="personagem" type="Node2D" groups=["jogador"]]
 position = Vector2(-16, -49)
 
 [node name="curumin" type="CharacterBody2D" parent="." groups=["jogador"]]
