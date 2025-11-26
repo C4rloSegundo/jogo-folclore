@@ -92,7 +92,9 @@ func levar_dano(dano: int):
 
 func morrer():
 	print("PERSONAGEM MORREU!")
-	get_tree().reload_current_scene()
+	# Muda para a cena de Game Over
+	# Certifique-se de salvar a cena de morte como "tela_morte.tscn"
+	get_tree().change_scene_to_file("res://tela_de_morte.tscn")
 
 # NOVO: Função para ativar o modo "fantasma"
 func iniciar_invencibilidade():
