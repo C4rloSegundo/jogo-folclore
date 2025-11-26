@@ -89,6 +89,7 @@ size = Vector2(79.75, 70.5)
 position = Vector2(-16, -49)
 
 [node name="curumin" type="CharacterBody2D" parent="." groups=["jogador"]]
+z_index = 1
 script = ExtResource("1_k0c8s")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="curumin"]
@@ -123,4 +124,9 @@ process_mode = 4
 position = Vector2(-27, 18)
 shape = SubResource("RectangleShape2D_7k68m")
 
+[node name="TimerInvencibilidade" type="Timer" parent="curumin"]
+wait_time = 0.5
+one_shot = true
+
 [connection signal="body_entered" from="curumin/Hitboxataque" to="curumin" method="_on_hitbox_ataque_area_entered"]
+[connection signal="timeout" from="curumin/TimerInvencibilidade" to="curumin" method="_on_timer_invencibilidade_timeout"]

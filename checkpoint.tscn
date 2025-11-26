@@ -1,0 +1,72 @@
+[gd_scene load_steps=11 format=3 uid="uid://b0or6hhmij06l"]
+
+[ext_resource type="Texture2D" uid="uid://ccoa25rm2rgt8" path="res://assets/cenario/campfire on.png" id="1_r6hke"]
+[ext_resource type="Script" uid="uid://b1yew1q5twygr" path="res://checkpoint.gd" id="1_tnhlw"]
+[ext_resource type="Texture2D" uid="uid://dk7p5xmagwaov" path="res://assets/cenario/campfire off.png" id="2_tnhlw"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_plj7t"]
+atlas = ExtResource("2_tnhlw")
+region = Rect2(0, 0, 142, 147)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s20m7"]
+atlas = ExtResource("1_r6hke")
+region = Rect2(0, 0, 146, 187)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q25r3"]
+atlas = ExtResource("1_r6hke")
+region = Rect2(164, 0, 146, 187)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4eun3"]
+atlas = ExtResource("1_r6hke")
+region = Rect2(328, 0, 146, 187)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7dqgm"]
+atlas = ExtResource("1_r6hke")
+region = Rect2(492, 0, 146, 187)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_dtr31"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_plj7t")
+}],
+"loop": true,
+"name": &"apagada",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_s20m7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q25r3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4eun3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7dqgm")
+}],
+"loop": true,
+"name": &"queimando",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tnhlw"]
+radius = 22.022715
+
+[node name="checkpoint" type="Area2D"]
+script = ExtResource("1_tnhlw")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(31, -15)
+scale = Vector2(0.43613014, 0.3141711)
+sprite_frames = SubResource("SpriteFrames_dtr31")
+animation = &"queimando"
+autoplay = "queimando"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(28, -19)
+shape = SubResource("CircleShape2D_tnhlw")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
