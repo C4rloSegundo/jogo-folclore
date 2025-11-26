@@ -9,8 +9,11 @@ const CENA_BOLA_FOGO = preload("res://bola_de_fogo.tscn")
 # --- Estado ---
 var vida_max: int = 3
 var vida_atual: int = 3
-var ultimo_checkpoint_pos: Vector2
 var esta_invencivel: bool = false 
+
+# Variáveis de Pulo Duplo
+var tem_pulo_duplo: bool = false 
+var pulos_realizados: int = 0
 
 signal saude_mudou(vida_atual: int)
 
@@ -21,95 +24,82 @@ signal saude_mudou(vida_atual: int)
 @onready var timer_invencibilidade: Timer = $TimerInvencibilidade 
 @onready var ponto_tiro: Marker2D = get_node_or_null("PontoTiro")
 
+# NOVO: Referência às partículas (Crie o nó na cena!)
+@onready var fumaça_pulo: CPUParticles2D = get_node_or_null("ParticulaPulo")
+
 func _ready():
 	vida_atual = vida_max
-	ultimo_checkpoint_pos = global_position
-	
-	if not ponto_tiro:
-		print("ERRO: O nó 'PontoTiro' (Marker2D) não foi encontrado!")
-	
-	if shape_ataque:
-		shape_ataque.disabled = true
+	if shape_ataque: shape_ataque.disabled = true
 	add_to_group("jogador")
 
 func _physics_process(delta: float):
 	
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * delta
+	else:
+		pulos_realizados = 0 # Reseta os pulos ao tocar no chão
 
-	if Input.is_action_just_pressed("pular") and is_on_floor():
-		velocity.y = FORCA_PULO
+	# --- SISTEMA DE PULO DUPLO ---
+	if Input.is_action_just_pressed("pular"):
+		
+		# Pulo 1: Chão
+		if is_on_floor():
+			velocity.y = FORCA_PULO
+			pulos_realizados = 1
+			
+		# Pulo 2: Ar (Pulo Duplo)
+		elif tem_pulo_duplo and pulos_realizados < 2:
+			velocity.y = FORCA_PULO
+			pulos_realizados += 1
+			
+			# EFEITO VISUAL DO PULO DUPLO
+			if fumaça_pulo:
+				fumaça_pulo.restart() # Reinicia a explosão de partículas
+				fumaça_pulo.emitting = true
 
+	# --- Movimento ---
 	var direcao = Input.get_axis("esquerda", "direita")
 	velocity.x = direcao * VELOCIDADE_ANDAR
 	
-	# --- SISTEMA DE VIRAR TUDO ---
-	if direcao > 0: # Direita
+	# Virar Sprite... (código igual ao anterior)
+	if direcao > 0: 
 		sprite.flip_h = false
-		
-		# Empurra Hitbox para a direita
-		if hitbox_ataque:
-			hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
-			
-		# Empurra Mira para a direita (Valor Positivo)
-		if ponto_tiro:
-			ponto_tiro.position.x = abs(ponto_tiro.position.x)
-		
-	elif direcao < 0: # Esquerda
+		if hitbox_ataque: hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
+		if ponto_tiro: ponto_tiro.position.x = abs(ponto_tiro.position.x)
+	elif direcao < 0: 
 		sprite.flip_h = true
-		
-		# Empurra Hitbox para a esquerda
-		if hitbox_ataque:
-			hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
-			
-		# Empurra Mira para a esquerda (Valor Negativo)
-		if ponto_tiro:
-			ponto_tiro.position.x = -abs(ponto_tiro.position.x)
+		if hitbox_ataque: hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
+		if ponto_tiro: ponto_tiro.position.x = -abs(ponto_tiro.position.x)
 	
-	# --- Ataque ---
+	# Ataque... (código igual ao anterior)
 	if Input.is_action_just_pressed("atacar"):
 		sprite.play("atacando")
-		sprite.position.y = 0 
-		if shape_ataque:
-			shape_ataque.disabled = false
-		
-		# Dispara a bola
+		if shape_ataque: shape_ataque.disabled = false
 		criar_bola_de_fogo()
 	
 	elif sprite.animation != "atacando" or not sprite.is_playing():
-		if shape_ataque:
-			shape_ataque.disabled = true
-			
+		if shape_ataque: shape_ataque.disabled = true
 		if not is_on_floor(): sprite.play("pulando")
 		elif direcao != 0: sprite.play("andando")
 		else: sprite.play("parado")
 
 	move_and_slide()
 
-# --- FUNÇÃO DE TIRO ---
-func criar_bola_de_fogo():
-	if not ponto_tiro:
-		print("ERRO: PontoTiro não encontrado!")
-		return
+# --- Função chamada pelo Saci ---
+func desbloquear_pulo_duplo():
+	tem_pulo_duplo = true
+	print("PODER RECEBIDO: Pulo Duplo Ativado!")
 
+# ... (Resto das funções criar_bola_de_fogo, levar_dano, etc. continuam iguais) ...
+func criar_bola_de_fogo():
+	if not ponto_tiro: return
 	var nova_bola = CENA_BOLA_FOGO.instantiate()
-	
-	# 1. Direção
-	if sprite.flip_h:
-		nova_bola.direcao = -1
-	else:
-		nova_bola.direcao = 1
-	
-	# 2. O SEGREDO MÁXIMO (Top Level + Marker2D)
-	# O top_level faz a bola ignorar escalas estranhas do cenário
+	if sprite.flip_h: nova_bola.direcao = -1
+	else: nova_bola.direcao = 1
 	nova_bola.top_level = true
-	
-	# A global_position pega a coordenada exata do pixel da tua mira no mundo
 	nova_bola.global_position = ponto_tiro.global_position
-	
-	# 3. Adiciona ao mundo
 	get_parent().add_child(nova_bola)
-# ... (Resto das funções de dano mantidas iguais) ...
+
 func levar_dano(dano: int):
 	if esta_invencivel: return
 	vida_atual -= dano
