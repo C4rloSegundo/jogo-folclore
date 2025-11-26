@@ -118,12 +118,6 @@ collision_mask = 16
 process_mode = 4
 shape = SubResource("RectangleShape2D_7k68m")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="curumin/Hitboxataque"]
-process_mode = 4
-visible = false
-position = Vector2(-27, 18)
-shape = SubResource("RectangleShape2D_7k68m")
-
 [node name="TimerInvencibilidade" type="Timer" parent="curumin"]
 wait_time = 0.5
 one_shot = true

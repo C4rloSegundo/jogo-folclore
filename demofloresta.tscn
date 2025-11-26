@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://b5nl8qhpdnjn8"]
+[gd_scene load_steps=16 format=3 uid="uid://b5nl8qhpdnjn8"]
 
 [ext_resource type="Script" uid="uid://fhk3w0yjmyn8" path="res://demofloresta.gd" id="1_euhhy"]
 [ext_resource type="Texture2D" uid="uid://dtry2efxjaal2" path="res://assets/cenario/cenario2d.png" id="1_r176x"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://d3d8ifa4ywumy" path="res://hud.tscn" id="7_lnard"]
 [ext_resource type="PackedScene" uid="uid://crhbn457e4ea2" path="res://espinho.tscn" id="8_orw4n"]
 [ext_resource type="PackedScene" uid="uid://b0or6hhmij06l" path="res://checkpoint.tscn" id="9_d34sx"]
+[ext_resource type="PackedScene" uid="uid://c25g8n8ej5t6j" path="res://saci_preso.tscn" id="10_plmph"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_b676b"]
 
@@ -960,6 +961,9 @@ position = Vector2(83, 154)
 
 [node name="checkpoint" parent="." instance=ExtResource("9_d34sx")]
 position = Vector2(-136, 165)
+
+[node name="saci_preso" parent="." instance=ExtResource("10_plmph")]
+position = Vector2(529, 281)
 
 [connection signal="saude_mudou" from="personagem/curumin" to="hud/ContainerCoracoes" method="_on_curumin_saude_mudou"]
 [connection signal="body_entered" from="ZonaDeMorte" to="." method="_on_zona_de_morte_body_entered"]
