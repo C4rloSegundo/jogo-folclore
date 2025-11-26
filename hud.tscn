@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://d3d8ifa4ywumy"]
 
 [ext_resource type="Script" uid="uid://dfkp6y6fmc50o" path="res://container_coracoes.gd" id="1_64ctp"]
-[ext_resource type="Texture2D" uid="uid://db3ro0cynr83e" path="res://hud/image-removebg-preview (1).png" id="2_8sq4i"]
+[ext_resource type="Texture2D" uid="uid://db3ro0cynr83e" path="res://assets/hud/image-removebg-preview (1).png" id="2_8sq4i"]
 
 [node name="hud" type="CanvasLayer"]
 
