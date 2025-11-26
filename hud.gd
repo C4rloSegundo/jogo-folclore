@@ -1,14 +1,29 @@
-extends HBoxContainer
+extends CanvasLayer
 
-# Esta função será chamada pelo sinal do Player
-func _on_player_saude_mudou(vida_atual: int):
-	# Pega todos os corações (filhos deste nó)
-	var coracoes = get_children()
+@onready var label_tempo = $LabelTempo # Certifique-se que o Label existe na cena
+
+var tempo_decorrido: float = 0.0
+var cronometro_ativo: bool = true
+
+func _process(delta):
+	# Só conta se o cronômetro estiver ligado
+	if cronometro_ativo:
+		# 'delta' é o tempo que passou desde o último frame (fração de segundos)
+		tempo_decorrido += delta
+		atualizar_texto()
+
+func atualizar_texto():
+	# Matemática para transformar números quebrados em Minutos:Segundos:Milissegundos
+	var milisegundos = fmod(tempo_decorrido, 1) * 1000
+	var segundos = fmod(tempo_decorrido, 60)
+	var minutos = tempo_decorrido / 60
 	
-	# Loop para ligar ou desligar cada coração
-	for i in range(coracoes.size()):
-		# Se o índice (0, 1, 2) for menor que a vida atual, mostra. Senão, esconde.
-		if i < vida_atual:
-			coracoes[i].visible = true
-		else:
-			coracoes[i].visible = false
+	# Formatação estilo ranking: 02:15.340
+	# %02d = 2 dígitos inteiros
+	# %03d = 3 dígitos (para milissegundos)
+	label_tempo.text = "%02d:%02d.%03d" % [minutos, segundos, milisegundos]
+
+# Função para parar o tempo quando chegar no final da fase
+func parar_e_pegar_tempo():
+	cronometro_ativo = false
+	return tempo_decorrido
