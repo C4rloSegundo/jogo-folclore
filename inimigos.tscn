@@ -20,13 +20,13 @@ region = Rect2(682, 0, 341, 341)
 atlas = ExtResource("2_8pes2")
 region = Rect2(0, 682, 341, 341)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_8pes2"]
+atlas = ExtResource("3_8pes2")
+region = Rect2(413, 341, 195, 341)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_0tcue"]
 atlas = ExtResource("3_8pes2")
-region = Rect2(341, 0, 341, 341)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_d7x0g"]
-atlas = ExtResource("3_8pes2")
-region = Rect2(682, 682, 341, 341)
+region = Rect2(0, 828, 369, 138)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_0tcue"]
 animations = [{
@@ -54,25 +54,24 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_0tcue")
+"texture": SubResource("AtlasTexture_8pes2")
 }, {
 "duration": 1.0,
-"texture": SubResource("AtlasTexture_d7x0g")
+"texture": SubResource("AtlasTexture_0tcue")
 }],
 "loop": false,
 "name": &"morrendo",
 "speed": 5.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_d7x0g"]
-radius = 28.551502
-height = 167.48581
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_iaahx"]
+size = Vector2(73.47066, 144.38431)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_klq5n"]
 size = Vector2(61.225555, 147.272)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
-size = Vector2(44.7993, 82.1753)
+size = Vector2(22.85682, 39.507343)
 
 [node name="inimigos" type="Node2D"]
 position = Vector2(2, -27)
@@ -86,15 +85,16 @@ motion_mode = 1
 script = ExtResource("1_klq5n")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="soldado"]
-position = Vector2(-1.9073486e-06, 0)
+position = Vector2(9.183834, -2.8876877)
 scale = Vector2(0.497, 0.497)
 sprite_frames = SubResource("SpriteFrames_0tcue")
-animation = &"andar"
+animation = &"morrendo"
 autoplay = "andar"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado"]
-position = Vector2(8.34465e-07, -2.887683)
-shape = SubResource("CapsuleShape2D_d7x0g")
+position = Vector2(2.3841858e-06, 5.7753754)
+scale = Vector2(1.0000001, 1)
+shape = SubResource("RectangleShape2D_iaahx")
 
 [node name="detector_parede" type="RayCast2D" parent="soldado"]
 exclude_parent = false
@@ -105,6 +105,7 @@ exclude_parent = false
 target_position = Vector2(16, 500)
 
 [node name="Hurtbox" type="Area2D" parent="soldado" groups=["inimigos"]]
+visible = false
 collision_layer = 16
 collision_mask = 4
 
@@ -114,10 +115,8 @@ scale = Vector2(1.0000001, 1)
 shape = SubResource("RectangleShape2D_klq5n")
 
 [node name="HitboxDano" type="Area2D" parent="soldado"]
-visible = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/HitboxDano"]
-visible = false
-position = Vector2(1.53063, 14.4384)
+position = Vector2(-1.5306416, 2.8876877)
 scale = Vector2(3.34832, 3.65462)
 shape = SubResource("RectangleShape2D_8pes2")

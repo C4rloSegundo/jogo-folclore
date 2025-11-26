@@ -1,0 +1,20 @@
+[gd_scene load_steps=3 format=3 uid="uid://crhbn457e4ea2"]
+
+[ext_resource type="Script" uid="uid://cqb6sfm23dt5t" path="res://espinho.gd" id="1_cmi34"]
+[ext_resource type="Texture2D" uid="uid://skm5hy3d0wcr" path="res://assets/inimigos/espinho-removebg-preview.png" id="2_7qu5q"]
+
+[node name="Espinho" type="Node2D"]
+
+[node name="espinho" type="Area2D" parent="."]
+position = Vector2(1, -2)
+script = ExtResource("1_cmi34")
+
+[node name="Sprite2D" type="Sprite2D" parent="espinho"]
+position = Vector2(-1.0000019, -5)
+scale = Vector2(0.058000002, 0.049999982)
+texture = ExtResource("2_7qu5q")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="espinho"]
+polygon = PackedVector2Array(-9, 2, 7, 2, 7, 2, -1, -11, -1, -11)
+
+[connection signal="body_entered" from="espinho" to="espinho" method="_on_body_entered"]

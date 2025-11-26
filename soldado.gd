@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 # --- Variáveis de Patrulha ---
 @export var speed = 40.0
-var gravity = 1000.0 # Define a gravidade para o inimigo
+var gravity = 100.0 # Define a gravidade para o inimigo
 var direction = -1     # Começa andando para a esquerda
 
 # --- Variáveis de Combate ---
