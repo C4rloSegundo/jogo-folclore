@@ -86,14 +86,14 @@ size = Vector2(20, 49)
 size = Vector2(79.75, 70.5)
 
 [node name="personagem" type="Node2D"]
-position = Vector2(-4, -37)
+position = Vector2(-16, -49)
 
 [node name="curumin" type="CharacterBody2D" parent="." groups=["jogador"]]
 script = ExtResource("1_k0c8s")
 
 [node name="Sprite" type="AnimatedSprite2D" parent="curumin"]
 position = Vector2(0, 3.0000014)
-scale = Vector2(0.25263157, 0.23589742)
+scale = Vector2(0.25263157, 0.25128204)
 sprite_frames = SubResource("SpriteFrames_87qvo")
 animation = &"andando"
 centered = false
