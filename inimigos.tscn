@@ -1,8 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://xglyfkoqg2ou"]
+[gd_scene load_steps=19 format=3 uid="uid://xglyfkoqg2ou"]
 
 [ext_resource type="Script" uid="uid://cjy8dg6mewkky" path="res://soldado.gd" id="1_klq5n"]
 [ext_resource type="Texture2D" uid="uid://l4j0fjf215jt" path="res://assets/inimigos/soldado andando-Photoroom.png" id="2_8pes2"]
 [ext_resource type="Texture2D" uid="uid://da1on20jaquoh" path="res://assets/inimigos/Gemini_Generated_Image_runwz7runwz7runw-Photoroom.png" id="3_8pes2"]
+[ext_resource type="Texture2D" uid="uid://dltywoty8a5nb" path="res://assets/inimigos/soldado atirando.png" id="3_iaahx"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_iaahx"]
 atlas = ExtResource("2_8pes2")
@@ -19,6 +20,18 @@ region = Rect2(682, 0, 341, 341)
 [sub_resource type="AtlasTexture" id="AtlasTexture_p4vup"]
 atlas = ExtResource("2_8pes2")
 region = Rect2(0, 682, 341, 341)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5auhy"]
+atlas = ExtResource("3_iaahx")
+region = Rect2(712, 0, 307, 341)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yphg0"]
+atlas = ExtResource("3_iaahx")
+region = Rect2(98, 0, 307, 341)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vup8q"]
+atlas = ExtResource("3_iaahx")
+region = Rect2(405, 0, 307, 341)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_0tcue"]
 atlas = ExtResource("3_8pes2")
@@ -47,9 +60,18 @@ animations = [{
 "name": &"andar",
 "speed": 5.0
 }, {
-"frames": [],
-"loop": true,
-"name": &"default",
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5auhy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yphg0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vup8q")
+}],
+"loop": false,
+"name": &"atacando",
 "speed": 5.0
 }, {
 "frames": [{
@@ -72,10 +94,10 @@ height = 167.48581
 size = Vector2(61.225555, 147.272)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
-size = Vector2(44.7993, 82.1753)
+size = Vector2(145.36937, 39.50734)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8pes2"]
-radius = 173.15584
+radius = 245.05539
 
 [node name="inimigos" type="Node2D"]
 position = Vector2(2, -27)
@@ -92,7 +114,7 @@ script = ExtResource("1_klq5n")
 position = Vector2(-1.9073486e-06, 0)
 scale = Vector2(0.497, 0.497)
 sprite_frames = SubResource("SpriteFrames_0tcue")
-animation = &"andar"
+animation = &"atacando"
 autoplay = "andar"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado"]
@@ -117,11 +139,11 @@ scale = Vector2(1.0000001, 1)
 shape = SubResource("RectangleShape2D_klq5n")
 
 [node name="HitboxDano" type="Area2D" parent="soldado"]
-visible = false
+collision_layer = 7
+collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/HitboxDano"]
-visible = false
-position = Vector2(1.53063, 14.4384)
+position = Vector2(1.5306458, 5.7753754)
 scale = Vector2(3.34832, 3.65462)
 shape = SubResource("RectangleShape2D_8pes2")
 
