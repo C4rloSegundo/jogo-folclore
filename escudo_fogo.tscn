@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d04mpjfk4kmlk"]
+[gd_scene load_steps=9 format=3 uid="uid://d04mpjfk4kmlk"]
 
 [ext_resource type="Script" uid="uid://dvw0l2q7bhwa0" path="res://escudo_fogo.gd" id="1_8266s"]
 [ext_resource type="Texture2D" uid="uid://bg8nyuruy61hr" path="res://assets/poderes/Yellow Effect Bullet Impact Explosion 32x32.png" id="2_0g5n3"]
@@ -39,12 +39,17 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="EscudoFogo" type="Node2D"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_8266s"]
+radius = 8.0
+
+[node name="EscudoFogo" type="Area2D"]
 script = ExtResource("1_8266s")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(40, 0)
 rotation = 1.5707964
 sprite_frames = SubResource("SpriteFrames_1xcka")
 autoplay = "default"
 frame_progress = 0.9650256
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["jogador"]]
+shape = SubResource("CapsuleShape2D_8266s")

@@ -128,5 +128,8 @@ position = Vector2(31, 19)
 [node name="PontoEfeitoPulo" type="Marker2D" parent="curumin"]
 position = Vector2(14, 44)
 
+[node name="PontoEscudo" type="Marker2D" parent="curumin"]
+position = Vector2(31, 20)
+
 [connection signal="body_entered" from="curumin/Hitboxataque" to="curumin" method="_on_hitbox_ataque_area_entered"]
 [connection signal="timeout" from="curumin/TimerInvencibilidade" to="curumin" method="_on_timer_invencibilidade_timeout"]

@@ -22,7 +22,7 @@ var tem_poder_fogo: bool = false
 var tem_escudo_fogo: bool = false 
 var pulos_realizados: int = 0
 
-# Variável para guardar o escudo (IMPORTANTE PARA LIGAR/DESLIGAR)
+# Variável para guardar o escudo
 var escudo_ativo: Node2D = null
 
 # Variáveis de Ataque
@@ -39,6 +39,8 @@ signal saude_mudou(vida_atual: int)
 @onready var timer_invencibilidade: Timer = $TimerInvencibilidade 
 @onready var ponto_tiro: Marker2D = get_node_or_null("PontoTiro")
 @onready var ponto_efeito_pulo: Marker2D = get_node_or_null("PontoEfeitoPulo")
+# NOVO: Referência ao ponto do escudo
+@onready var ponto_escudo: Marker2D = get_node_or_null("PontoEscudo")
 
 func _ready():
 	vida_atual = vida_max
@@ -72,22 +74,25 @@ func _physics_process(delta: float):
 	var direcao = Input.get_axis("esquerda", "direita")
 	velocity.x = direcao * VELOCIDADE_ANDAR
 	
-	# --- VIRAR TUDO ---
-	if direcao > 0: 
+	# --- VIRAR TUDO (Sprite, Mira, Hitbox, Escudo) ---
+	if direcao > 0: # Direita
 		sprite.flip_h = false
 		if hitbox_ataque: hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
 		if ponto_tiro: ponto_tiro.position.x = abs(ponto_tiro.position.x)
-		# Move o escudo para a direita se ele existir
-		if is_instance_valid(escudo_ativo):
-			escudo_ativo.position.x = abs(escudo_ativo.position.x)
+		# Vira o ponto do escudo para a direita
+		if ponto_escudo: ponto_escudo.position.x = abs(ponto_escudo.position.x)
 			
-	elif direcao < 0: 
+	elif direcao < 0: # Esquerda
 		sprite.flip_h = true
 		if hitbox_ataque: hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
 		if ponto_tiro: ponto_tiro.position.x = -abs(ponto_tiro.position.x)
-		# Move o escudo para a esquerda se ele existir
-		if is_instance_valid(escudo_ativo):
-			escudo_ativo.position.x = -abs(escudo_ativo.position.x)
+		# Vira o ponto do escudo para a esquerda
+		if ponto_escudo: ponto_escudo.position.x = -abs(ponto_escudo.position.x)
+	
+	# --- ATUALIZAR POSIÇÃO DO ESCUDO (SE ELE EXISTIR) ---
+	# Isto garante que o escudo segue o marcador frame a frame
+	if is_instance_valid(escudo_ativo) and ponto_escudo:
+		escudo_ativo.position = ponto_escudo.position
 	
 	# --- ATAQUE ---
 	if Input.is_action_just_pressed("atacar"):
@@ -98,7 +103,7 @@ func _physics_process(delta: float):
 			pode_atirar = false
 			timer_cooldown.start()
 	
-	# --- HABILIDADE ESCUDO (Tecla definida no Input Map como "escudo") ---
+	# --- HABILIDADE ESCUDO ---
 	elif Input.is_action_just_pressed("escudo"):
 		if tem_escudo_fogo:
 			ativar_desativar_escudo()
@@ -121,10 +126,35 @@ func curar_total():
 func _on_cooldown_acabou():
 	pode_atirar = true 
 
-# --- FUNÇÃO DE TIRO ---
+# --- LÓGICA DO ESCUDO (SIMPLIFICADA COM MARKER) ---
+func ativar_desativar_escudo():
+	if is_instance_valid(escudo_ativo):
+		# Desliga
+		escudo_ativo.queue_free()
+		escudo_ativo = null
+		print("Escudo OFF")
+	else:
+		# Liga
+		if not ponto_escudo:
+			print("ERRO: Falta o nó 'PontoEscudo' na cena!")
+			return
+			
+		escudo_ativo = CENA_ESCUDO.instantiate()
+		
+		# Configurações Visuais (Tamanho)
+		escudo_ativo.scale = Vector2(1.5, 1.5) # Ajuste o tamanho aqui
+		
+		# Define a posição inicial
+		escudo_ativo.position = ponto_escudo.position
+		
+		# Adiciona como filho DO JOGADOR (para se mover junto)
+		add_child(escudo_ativo)
+		print("Escudo ON")
+
+# --- RESTO DAS FUNÇÕES (TIRO, DANO, ETC) ---
+# (Mantém as funções de tiro e desbloqueio iguais às anteriores)
 func criar_bola_de_fogo():
 	if not ponto_tiro: return
-	
 	var nova_bola
 	if tem_poder_fogo:
 		nova_bola = CENA_FOGO_FINAL.instantiate()
@@ -139,39 +169,6 @@ func criar_bola_de_fogo():
 	nova_bola.global_position = ponto_tiro.global_position
 	get_parent().add_child(nova_bola)
 
-# --- LÓGICA DE LIGAR/DESLIGAR ESCUDO ---
-# --- LÓGICA DE LIGAR/DESLIGAR ESCUDO ---
-func ativar_desativar_escudo():
-	# Se já existe, desliga
-	if is_instance_valid(escudo_ativo):
-		escudo_ativo.queue_free()
-		escudo_ativo = null 
-		print("Escudo Desligado.")
-	
-	# Se não existe, liga
-	else:
-		escudo_ativo = CENA_ESCUDO.instantiate()
-		
-		# --- CONFIGURAÇÕES DE AJUSTE FINO ---
-		var distancia_x = 20.0  # Quão longe do corpo (Horizontal)
-		var altura_y = -25.0    # Altura (Negativo = Para Cima, tente -20 ou -30)
-		var tamanho = 0.6       # Escala (1.0 = Normal, 0.5 = Metade)
-		
-		# 1. Aplica o Tamanho
-		escudo_ativo.scale = Vector2(tamanho, tamanho)
-		
-		# 2. Define a Posição Inicial
-		if sprite.flip_h: 
-			# Olhando para a Esquerda
-			escudo_ativo.position = Vector2(-distancia_x, altura_y)
-		else:
-			# Olhando para a Direita
-			escudo_ativo.position = Vector2(distancia_x, altura_y)
-		
-		add_child(escudo_ativo)
-		print("Escudo Ligado!")
-
-# --- DESBLOQUEIOS ---
 func desbloquear_pulo_duplo():
 	tem_pulo_duplo = true
 	print("PODER: Pulo Duplo!")
@@ -183,21 +180,34 @@ func desbloquear_poder_fogo():
 func desbloquear_escudo_fogo():
 	if not tem_escudo_fogo:
 		tem_escudo_fogo = true
-		print("PODER: Escudo Desbloqueado! Aperte a tecla de escudo.")
+		print("PODER: Escudo Desbloqueado!")
 
-# ... (Resto igual) ...
 func criar_efeito_pulo():
 	if not CENA_EFEITO_PULO or not ponto_efeito_pulo: return
 	var efeito = CENA_EFEITO_PULO.instantiate()
 	efeito.position = ponto_efeito_pulo.position
 	add_child(efeito)
 
+# --- FUNÇÃO DE DANO COM ESCUDO ---
 func levar_dano(dano: int):
-	if esta_invencivel: return
+	# 1. Se já estiver invencível (pós-hit), ignora
+	if esta_invencivel: 
+		return
+
+	# 2. SE O ESCUDO ESTIVER LIGADO, IGNORA O DANO!
+	if is_instance_valid(escudo_ativo):
+		print("ESCUDO PROTEGEU!")
+		# Opcional: Tocar som de metal batendo ou piscar o escudo
+		return
+
+	# 3. Se não tiver escudo nem invencibilidade, leva dano
 	vida_atual -= dano
 	saude_mudou.emit(vida_atual)
-	if vida_atual <= 0: morrer()
-	else: iniciar_invencibilidade()
+	
+	if vida_atual <= 0:
+		morrer()
+	else:
+		iniciar_invencibilidade()
 
 func morrer():
 	get_tree().change_scene_to_file("res://tela_de_morte.tscn")
