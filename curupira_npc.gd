@@ -7,35 +7,37 @@ var indice_frase: int = 0
 var jogador_ref: Node2D = null
 var ja_libertado: bool = false
 
-# --- Falas ---
+# --- Falas do Curupira (Narrativa do Pai) ---
 var falas_preso: Array[String] = [
 	"Curupira: Ei! Psiu! Você aí!",
 	"Curupira: Esses caçadores me prenderam com ferro frio...",
-	"Curupira: Me ajude a sair daqui, por favor!",
-	"Curupira: (Pressione F para quebrar a jaula)"
+	"Curupira: Minha magia não funciona contra este metal.",
+	"Curupira: Por favor, quebre esta jaula! (Pressione F)"
 ]
 
 var falas_livre: Array[String] = [
-	"Curupira: Ah! A liberdade! O cheiro da mata!",
-	"Curupira: Eu sou o Curupira, protetor desta floresta.",
-	"Curupira: Você tem um coração bom, forasteiro.",
-	"Curupira: Como gratidão, vou te ensinar um segredo antigo...",
-	"Curupira: (Você recebeu o Poder de Fogo Final!)", # Texto atualizado
-	"Curupira: Agora vá! A floresta precisa de nós. Adeus!"
+	"Curupira: Ah! Finalmente livre! Meus pés virados agradecem.",
+	"Curupira: Espere... esses olhos... essa coragem...",
+	"Curupira: Meu filho! É você! Eu sabia que viria.",
+	"Curupira: Eu sou o Curupira, guardião desta mata... e seu pai.",
+	"Curupira: Fui capturado tentando proteger o Coração da Floresta.",
+	"Curupira: Mas agora vejo que o destino escolheu você para terminar minha missão.",
+	"Curupira: Você é o único que pode deter a destruição que se aproxima.",
+	"Curupira: Tome, receba a minha chama sagrada. Ela é sua por direito.",
+	"Curupira: (Você recebeu o Poder de Fogo Final!)",
+	"Curupira: Agora vá, meu filho! Mostre a eles a fúria da natureza. Eu estarei sempre contigo."
 ]
 
-# --- Referências (CORRIGIDAS PARA A TUA CENA) ---
+# --- Referências ---
 @onready var sprite: Sprite2D = $Sprite2D
-# O nome na tua cena é "Label", então usamos Label aqui
 @onready var label_aviso: Label = $Label 
 @onready var caixa_dialogo: Control = $CaixaDialogo
 @onready var texto_dialogo: Label = $CaixaDialogo/TextoDialogo
 @onready var colision_jaula: StaticBody2D = $StaticBody2D
 
 func _ready():
-	if label_aviso:
-		label_aviso.visible = false
-	if caixa_dialogo:
+	if label_aviso: label_aviso.visible = false
+	if caixa_dialogo: 
 		caixa_dialogo.visible = false
 		caixa_dialogo.z_index = 20
 
@@ -88,18 +90,18 @@ func dar_poder_e_sumir():
 	dialogo_ativo = false
 	if caixa_dialogo: caixa_dialogo.visible = false
 	
-	print("Curupira: Toma o Fogo Azul e o Escudo Protetor!")
+	print("Curupira (Pai): Receba o Fogo Final, meu filho!")
 	
 	if jogador_ref:
-		# Dá o poder de fogo
+		# Dá o Fogo Final
 		if jogador_ref.has_method("desbloquear_poder_fogo"):
 			jogador_ref.desbloquear_poder_fogo()
-		
-		# Dá o escudo (NOVO)
+			
+		# Dá o Escudo (Opcional, se quiseres manter)
 		if jogador_ref.has_method("desbloquear_escudo_fogo"):
 			jogador_ref.desbloquear_escudo_fogo()
 	
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(2.0).timeout # Tempo para ler a última mensagem mentalmente
 	queue_free()
 
 # --- SINAIS ---

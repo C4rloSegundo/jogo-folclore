@@ -22,13 +22,18 @@ var tem_poder_fogo: bool = false
 var tem_escudo_fogo: bool = false 
 var pulos_realizados: int = 0
 
-# Variável para guardar o escudo (IMPORTANTE PARA LIGAR/DESLIGAR)
-var escudo_ativo: Node2D = null
-
-# Variáveis de Ataque
+# Variáveis de Controlo
 var pode_atirar: bool = true
 var tempo_recarga_tiro: float = 0.5 
 var timer_cooldown: Timer 
+
+# --- ESCUDO (NOVO) ---
+var escudo_ativo: Node2D = null
+var pode_usar_escudo: bool = true
+var duracao_escudo: float = 2.0 # Tempo que fica ligado
+var cooldown_escudo: float = 3.0 # Tempo para recarregar depois de usar
+var timer_duracao_escudo: Timer
+var timer_cooldown_escudo: Timer
 
 signal saude_mudou(vida_atual: int)
 
@@ -39,26 +44,41 @@ signal saude_mudou(vida_atual: int)
 @onready var timer_invencibilidade: Timer = $TimerInvencibilidade 
 @onready var ponto_tiro: Marker2D = get_node_or_null("PontoTiro")
 @onready var ponto_efeito_pulo: Marker2D = get_node_or_null("PontoEfeitoPulo")
+@onready var ponto_escudo: Marker2D = get_node_or_null("PontoEscudo")
 
 func _ready():
 	vida_atual = vida_max
 	if shape_ataque: shape_ataque.disabled = true
 	add_to_group("jogador")
 	
+	# Timer Tiro
 	timer_cooldown = Timer.new()
 	timer_cooldown.wait_time = tempo_recarga_tiro
 	timer_cooldown.one_shot = true 
 	timer_cooldown.timeout.connect(_on_cooldown_acabou)
 	add_child(timer_cooldown)
+	
+	# Timer Duração Escudo (Quanto tempo fica ligado)
+	timer_duracao_escudo = Timer.new()
+	timer_duracao_escudo.wait_time = duracao_escudo
+	timer_duracao_escudo.one_shot = true
+	timer_duracao_escudo.timeout.connect(_on_escudo_acabou)
+	add_child(timer_duracao_escudo)
+	
+	# Timer Cooldown Escudo (Quanto tempo espera para usar de novo)
+	timer_cooldown_escudo = Timer.new()
+	timer_cooldown_escudo.wait_time = cooldown_escudo
+	timer_cooldown_escudo.one_shot = true
+	timer_cooldown_escudo.timeout.connect(_on_escudo_recarregado)
+	add_child(timer_cooldown_escudo)
 
 func _physics_process(delta: float):
-	
 	if not is_on_floor():
 		velocity.y += GRAVIDADE * delta
 	else:
 		pulos_realizados = 0 
 
-	# --- PULO DUPLO ---
+	# --- PULO ---
 	if Input.is_action_just_pressed("pular"):
 		if is_on_floor():
 			velocity.y = FORCA_PULO
@@ -77,17 +97,15 @@ func _physics_process(delta: float):
 		sprite.flip_h = false
 		if hitbox_ataque: hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
 		if ponto_tiro: ponto_tiro.position.x = abs(ponto_tiro.position.x)
-		# Move o escudo para a direita se ele existir
-		if is_instance_valid(escudo_ativo):
-			escudo_ativo.position.x = abs(escudo_ativo.position.x)
-			
+		if ponto_escudo: ponto_escudo.position.x = abs(ponto_escudo.position.x)
 	elif direcao < 0: 
 		sprite.flip_h = true
 		if hitbox_ataque: hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
 		if ponto_tiro: ponto_tiro.position.x = -abs(ponto_tiro.position.x)
-		# Move o escudo para a esquerda se ele existir
-		if is_instance_valid(escudo_ativo):
-			escudo_ativo.position.x = -abs(escudo_ativo.position.x)
+		if ponto_escudo: ponto_escudo.position.x = -abs(ponto_escudo.position.x)
+	
+	if is_instance_valid(escudo_ativo) and ponto_escudo:
+		escudo_ativo.position = ponto_escudo.position
 	
 	# --- ATAQUE ---
 	if Input.is_action_just_pressed("atacar"):
@@ -98,10 +116,10 @@ func _physics_process(delta: float):
 			pode_atirar = false
 			timer_cooldown.start()
 	
-	# --- HABILIDADE ESCUDO (Tecla definida no Input Map como "escudo") ---
+	# --- ESCUDO ---
 	elif Input.is_action_just_pressed("escudo"):
-		if tem_escudo_fogo:
-			ativar_desativar_escudo()
+		if tem_escudo_fogo and pode_usar_escudo:
+			ativar_escudo()
 	
 	elif sprite.animation != "atacando" or not sprite.is_playing():
 		if shape_ataque: shape_ataque.disabled = true
@@ -110,6 +128,7 @@ func _physics_process(delta: float):
 		else: sprite.play("parado")
 
 	move_and_slide()
+
 # --- NOVA FUNÇÃO DE CURA ---
 func curar_total():
 	vida_atual = vida_max
@@ -118,60 +137,58 @@ func curar_total():
 	# Salva a posição atual (Checkpoint)
 	ultimo_checkpoint_pos = global_position
 	print("Vida recuperada e Checkpoint Salvo!")
+
 func _on_cooldown_acabou():
 	pode_atirar = true 
 
-# --- FUNÇÃO DE TIRO ---
+# --- LÓGICA DO ESCUDO ---
+func ativar_escudo():
+	if is_instance_valid(escudo_ativo): return # Já está ligado
+	
+	if not ponto_escudo: return
+	
+	# Liga o escudo
+	escudo_ativo = CENA_ESCUDO.instantiate()
+	escudo_ativo.scale = Vector2(1.5, 1.5)
+	escudo_ativo.position = ponto_escudo.position
+	add_child(escudo_ativo)
+	print("Escudo LIGADO (Duração: 2s)")
+	
+	# Começa a contar o tempo de vida
+	timer_duracao_escudo.start()
+	
+	# Impede de usar de novo imediatamente (inicia recarga)
+	pode_usar_escudo = false
+
+func _on_escudo_acabou():
+	# O tempo acabou, desliga o escudo
+	if is_instance_valid(escudo_ativo):
+		escudo_ativo.queue_free()
+		escudo_ativo = null
+		print("Escudo DESLIGADO (Tempo Esgotado)")
+	
+	# Inicia o tempo de recarga para poder usar de novo
+	timer_cooldown_escudo.start()
+
+func _on_escudo_recarregado():
+	pode_usar_escudo = true
+	print("Escudo PRONTO para usar novamente!")
+
+# --- RESTO ---
 func criar_bola_de_fogo():
 	if not ponto_tiro: return
-	
 	var nova_bola
 	if tem_poder_fogo:
 		nova_bola = CENA_FOGO_FINAL.instantiate()
 		if "dano" in nova_bola: nova_bola.dano = 3 
 	else:
 		nova_bola = CENA_BOLA_FOGO.instantiate()
-	
 	if sprite.flip_h: nova_bola.direcao = -1
 	else: nova_bola.direcao = 1
-	
 	nova_bola.top_level = true
 	nova_bola.global_position = ponto_tiro.global_position
 	get_parent().add_child(nova_bola)
 
-# --- LÓGICA DE LIGAR/DESLIGAR ESCUDO ---
-# --- LÓGICA DE LIGAR/DESLIGAR ESCUDO ---
-func ativar_desativar_escudo():
-	# Se já existe, desliga
-	if is_instance_valid(escudo_ativo):
-		escudo_ativo.queue_free()
-		escudo_ativo = null 
-		print("Escudo Desligado.")
-	
-	# Se não existe, liga
-	else:
-		escudo_ativo = CENA_ESCUDO.instantiate()
-		
-		# --- CONFIGURAÇÕES DE AJUSTE FINO ---
-		var distancia_x = 20.0  # Quão longe do corpo (Horizontal)
-		var altura_y = -25.0    # Altura (Negativo = Para Cima, tente -20 ou -30)
-		var tamanho = 0.6       # Escala (1.0 = Normal, 0.5 = Metade)
-		
-		# 1. Aplica o Tamanho
-		escudo_ativo.scale = Vector2(tamanho, tamanho)
-		
-		# 2. Define a Posição Inicial
-		if sprite.flip_h: 
-			# Olhando para a Esquerda
-			escudo_ativo.position = Vector2(-distancia_x, altura_y)
-		else:
-			# Olhando para a Direita
-			escudo_ativo.position = Vector2(distancia_x, altura_y)
-		
-		add_child(escudo_ativo)
-		print("Escudo Ligado!")
-
-# --- DESBLOQUEIOS ---
 func desbloquear_pulo_duplo():
 	tem_pulo_duplo = true
 	print("PODER: Pulo Duplo!")
@@ -183,9 +200,8 @@ func desbloquear_poder_fogo():
 func desbloquear_escudo_fogo():
 	if not tem_escudo_fogo:
 		tem_escudo_fogo = true
-		print("PODER: Escudo Desbloqueado! Aperte a tecla de escudo.")
+		print("PODER: Escudo (Tecla Q)!")
 
-# ... (Resto igual) ...
 func criar_efeito_pulo():
 	if not CENA_EFEITO_PULO or not ponto_efeito_pulo: return
 	var efeito = CENA_EFEITO_PULO.instantiate()
@@ -194,6 +210,11 @@ func criar_efeito_pulo():
 
 func levar_dano(dano: int):
 	if esta_invencivel: return
+	# Se tiver escudo ligado, protege!
+	if is_instance_valid(escudo_ativo):
+		print("Escudo bloqueou o dano!")
+		return
+		
 	vida_atual -= dano
 	saude_mudou.emit(vida_atual)
 	if vida_atual <= 0: morrer()

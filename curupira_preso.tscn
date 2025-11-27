@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://dkg6stet6kts3"]
 
 [ext_resource type="Script" uid="uid://claknm5ychbbh" path="res://curupira_npc.gd" id="1_n52mt"]
-[ext_resource type="Texture2D" uid="uid://n1172x0w1ogy" path="res://assets/lendas/curupira_preso.png" id="2_n52mt"]
+[ext_resource type="Texture2D" uid="uid://blkiy8f2gnca" path="res://assets/lendas/image-removebg-preview_3.png" id="2_n52mt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_m1wyt"]
 radius = 57.558666
@@ -21,7 +21,7 @@ script = ExtResource("1_n52mt")
 
 [node name="Sprite2D" type="Sprite2D" parent="CurupiraNPC"]
 position = Vector2(-1.0000038, -0.99999905)
-scale = Vector2(0.045419037, 0.046484377)
+scale = Vector2(0.2, 0.205)
 texture = ExtResource("2_n52mt")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CurupiraNPC"]
@@ -43,7 +43,6 @@ position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_naiym")
 
 [node name="CaixaDialogo" type="Panel" parent="CurupiraNPC"]
-visible = false
 offset_left = -85.0
 offset_top = -74.0
 offset_right = 87.0
@@ -54,6 +53,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_naiym")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
+theme_override_font_sizes/font_size = 10
 
 [connection signal="body_entered" from="CurupiraNPC" to="CurupiraNPC" method="_on_body_entered"]
 [connection signal="body_exited" from="CurupiraNPC" to="CurupiraNPC" method="_on_body_exited"]

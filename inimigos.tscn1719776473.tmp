@@ -94,10 +94,10 @@ height = 167.48581
 size = Vector2(61.225555, 147.272)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8pes2"]
-size = Vector2(18.285446, 39.50734)
+size = Vector2(145.36937, 39.50734)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_8pes2"]
-radius = 532.67017
+radius = 245.05539
 
 [node name="inimigos" type="Node2D"]
 position = Vector2(2, -27)
@@ -109,6 +109,10 @@ collision_layer = 17
 collision_mask = 5
 motion_mode = 1
 script = ExtResource("1_klq5n")
+speed = null
+gravity = null
+tempo_patrulha = null
+dano_ataque = null
 
 [node name="Sprite" type="AnimatedSprite2D" parent="soldado"]
 position = Vector2(-1.9073486e-06, 0)
@@ -143,7 +147,7 @@ collision_layer = 7
 collision_mask = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="soldado/HitboxDano"]
-position = Vector2(-3.0612652, 5.7753754)
+position = Vector2(1.5306458, 5.7753754)
 scale = Vector2(3.34832, 3.65462)
 shape = SubResource("RectangleShape2D_8pes2")
 
