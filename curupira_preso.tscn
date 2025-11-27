@@ -43,7 +43,6 @@ position = Vector2(0, -0.5)
 shape = SubResource("RectangleShape2D_naiym")
 
 [node name="CaixaDialogo" type="Panel" parent="CurupiraNPC"]
-visible = false
 offset_left = -85.0
 offset_top = -74.0
 offset_right = 87.0
@@ -54,6 +53,7 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_naiym")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
+theme_override_font_sizes/font_size = 10
 
 [connection signal="body_entered" from="CurupiraNPC" to="CurupiraNPC" method="_on_body_entered"]
 [connection signal="body_exited" from="CurupiraNPC" to="CurupiraNPC" method="_on_body_exited"]
