@@ -8,20 +8,20 @@ const INTERVALO_ATAQUES: float = 2.0
 # --- PRELOADS ---
 const CENA_BALA = preload("res://bala.tscn")
 
-# --- Variaveis de Estado ---
+# --- Variáveis de Estado ---
 var vida_max: int = 1
 var vida_atual: int = 1
 var is_dead: bool = false
 var is_attacking: bool = false
 
-# --- Variaveis de Poderes ---
+# --- Variáveis de Poderes ---
 var pode_usar_laser: bool = true 
 
-# --- Variaveis de IA ---
+# --- Variáveis de IA ---
 var timer_cerebro: Timer
 var player_alvo: Node2D = null
 
-# --- Referencias ---
+# --- Referências ---
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var ponto_braco: Marker2D = get_node_or_null("PontoBraco")
 @onready var laser_peito: Area2D = get_node_or_null("LaserPeito")
@@ -177,20 +177,20 @@ func morrer():
 	sprite.stop()
 	sprite.play("morrendo")
 	
-	# Lembre-se de tirar o Loop da animacaoo no editor!
+	# Lembre-se de tirar o Loop da animação no editor!
 	await sprite.animation_finished
 	
-	print("BOSS: Destruido. Aguardando 5s...")
+	print("BOSS: Destruído. Aguardando 5s...")
 	await get_tree().create_timer(5.0).timeout
 	
-	# --- AJUSTADO PARA NOMES MINuSCULOS AQUI ---
-	var hud = get_tree().current_scene.get_node_or_null("hud") # "hud" minusculo
+	# --- AJUSTADO PARA NOMES MINÚSCULOS AQUI ---
+	var hud = get_tree().current_scene.get_node_or_null("hud") # "hud" minúsculo
 	
 	if hud and Global:
 		Global.tempo_da_partida = hud.parar_e_pegar_tempo()
 		print("Tempo salvo!")
 	else:
-		print("AVISO: 'hud' (minusculo) nao encontrado ou Global ausente.")
+		print("AVISO: 'hud' (minúsculo) não encontrado ou Global ausente.")
 	
 	# Caminho exato do arquivo
 	get_tree().change_scene_to_file("res://tela_vitoria.tscn")

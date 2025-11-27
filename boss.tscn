@@ -1,6 +1,6 @@
 [gd_scene load_steps=33 format=3 uid="uid://b48bcm1dpo0ho"]
 
-[ext_resource type="Script" uid="uid://dlnpx1pov2qjm" path="res://character_body_2d.gd" id="1_6xxrv"]
+[ext_resource type="Script" uid="uid://dlnpx1pov2qjm" path="res://RoboBoss.gd" id="1_6xxrv"]
 [ext_resource type="Texture2D" uid="uid://xt3gpmb6n8js" path="res://assets/inimigos/Military Incursion Bot Sprite Sheet.png" id="2_skx2t"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_lnbgr"]
@@ -219,7 +219,7 @@ animations = [{
 size = Vector2(70, 75.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6xxrv"]
-size = Vector2(313, 10)
+size = Vector2(313, 66)
 
 [node name="boss" type="Node2D" groups=["inimigos"]]
 
@@ -231,7 +231,7 @@ script = ExtResource("1_6xxrv")
 position = Vector2(-30, -17)
 scale = Vector2(1.025, 1.0104166)
 sprite_frames = SubResource("SpriteFrames_xvkcc")
-animation = &"parado"
+animation = &"morrendo"
 autoplay = "parado"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RoboBoss"]
@@ -246,13 +246,13 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RoboBoss/LaserPeito"]
-position = Vector2(126, -16)
+position = Vector2(126, -7)
 shape = SubResource("RectangleShape2D_6xxrv")
 debug_color = Color(0.94509804, 0.19607843, 0.050980393, 0.41960785)
 
 [node name="ColorRect" type="ColorRect" parent="RoboBoss/LaserPeito"]
 offset_left = -31.0
-offset_top = -21.0
+offset_top = -40.0
 offset_right = 282.0
-offset_bottom = -11.0
+offset_bottom = 25.0
 color = Color(0.94509804, 0.19607843, 0.050980393, 0.41960785)

@@ -23,13 +23,14 @@ radius = 5.0
 
 [node name="Bala" type="Area2D"]
 collision_layer = 0
+position = Vector2(-6, 0)
 script = ExtResource("1_ag3k0")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
 position = Vector2(222, 68)
 scale = Vector2(0.484375, 0.5097656)
 sprite_frames = SubResource("SpriteFrames_j8aw3")
-frame_progress = 0.7012893
+frame_progress = 0.27840328
 offset = Vector2(-434, -143)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
