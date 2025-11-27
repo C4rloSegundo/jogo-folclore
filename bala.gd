@@ -33,16 +33,20 @@ func _process(delta):
 	position += direcao * velocidade * delta
 
 func _on_body_entered(body):
+	# DEBUG: Mostra no console o que a bala acertou
+	print("Bala bateu em: ", body.name) 
+
+	# 1. PROTEÇÃO: Se acertar o Robô ou qualquer inimigo, IGNORA e sai.
 	if body.name == "RoboBoss" or body.is_in_group("inimigos"):
-		return
+		return 
 
+	# 2. Se acertar o jogador
 	if body.is_in_group("jogador") and body.has_method("levar_dano"):
-		body.levar_dano(dano)
-		queue_free()
-		return
-	
-	# Destrói se bater em qualquer outra coisa
-	queue_free()
-
+		body.levar_dano(1)
+		queue_free() # Some
+		
+	# 3. Se acertar parede/chão
+	elif body is TileMap or body is StaticBody2D:
+		queue_free() # Some
 func _on_visible_on_screen_notifier_2d_screen_exited():
 	queue_free()
