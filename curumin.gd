@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 # --- Constantes ---
 const VELOCIDADE_ANDAR: float = 150.0
-const FORCA_PULO: float = -300.0
+const FORCA_PULO: float = -310.0
 const GRAVIDADE: float = 400.0
 
 # --- PRELOADS ---
