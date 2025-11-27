@@ -4,15 +4,17 @@ extends CharacterBody2D
 const VELOCIDADE_ANDAR: float = 150.0
 const FORCA_PULO: float = -310.0
 const GRAVIDADE: float = 400.0
+
+# PRELOADS (Cenas Externas)
 const CENA_BOLA_FOGO = preload("res://bola_de_fogo.tscn")
+# Certifique-se de salvar sua cena de partícula com este nome!
+const CENA_EFEITO_PULO = preload("res://efeito_pulo.tscn")
 
 # --- Estado ---
 var vida_max: int = 3
 var vida_atual: int = 3
 var esta_invencivel: bool = false 
-
 var ultimo_checkpoint_pos: Vector2
-
 # Variáveis de Pulo Duplo
 var tem_pulo_duplo: bool = false 
 var pulos_realizados: int = 0
@@ -25,14 +27,20 @@ signal saude_mudou(vida_atual: int)
 @onready var shape_ataque = get_node_or_null("Hitboxataque/CollisionShape2D")
 @onready var timer_invencibilidade: Timer = $TimerInvencibilidade 
 @onready var ponto_tiro: Marker2D = get_node_or_null("PontoTiro")
-
-# NOVO: Referência às partículas (Crie o nó na cena!)
-@onready var fumaça_pulo: CPUParticles2D = get_node_or_null("ParticulaPulo")
+@onready var ponto_efeito_pulo: Marker2D = get_node_or_null("PontoEfeitoPulo")
 
 func _ready():
 	vida_atual = vida_max
 	if shape_ataque: shape_ataque.disabled = true
 	add_to_group("jogador")
+# --- NOVA FUNÇÃO DE CURA ---
+func curar_total():
+	vida_atual = vida_max
+	saude_mudou.emit(vida_atual) # Atualiza os corações na tela
+	
+	# Salva a posição atual (Checkpoint)
+	ultimo_checkpoint_pos = global_position
+	print("Vida recuperada e Checkpoint Salvo!")
 
 func _physics_process(delta: float):
 	
@@ -54,16 +62,14 @@ func _physics_process(delta: float):
 			velocity.y = FORCA_PULO
 			pulos_realizados += 1
 			
-			# EFEITO VISUAL DO PULO DUPLO
-			if fumaça_pulo:
-				fumaça_pulo.restart() # Reinicia a explosão de partículas
-				fumaça_pulo.emitting = true
+			# Cria o efeito visual de forma limpa
+			criar_efeito_pulo()
 
 	# --- Movimento ---
 	var direcao = Input.get_axis("esquerda", "direita")
 	velocity.x = direcao * VELOCIDADE_ANDAR
 	
-	# Virar Sprite... (código igual ao anterior)
+	# Virar Sprite...
 	if direcao > 0: 
 		sprite.flip_h = false
 		if hitbox_ataque: hitbox_ataque.position.x = abs(hitbox_ataque.position.x)
@@ -73,7 +79,7 @@ func _physics_process(delta: float):
 		if hitbox_ataque: hitbox_ataque.position.x = -abs(hitbox_ataque.position.x)
 		if ponto_tiro: ponto_tiro.position.x = -abs(ponto_tiro.position.x)
 	
-	# Ataque... (código igual ao anterior)
+	# Ataque...
 	if Input.is_action_just_pressed("atacar"):
 		sprite.play("atacando")
 		if shape_ataque: shape_ataque.disabled = false
@@ -87,12 +93,34 @@ func _physics_process(delta: float):
 
 	move_and_slide()
 
+# --- FUNÇÃO NOVA: CRIA O EFEITO VISUAL ---
+# --- FUNÇÃO ATUALIZADA: CRIA O EFEITO NO MARKER ---
+
+
+
+func criar_efeito_pulo():
+	if not CENA_EFEITO_PULO or not ponto_efeito_pulo:
+		return
+
+	var efeito = CENA_EFEITO_PULO.instantiate()
+	
+	# 1. NÃO usa top_level (assim ele fica preso ao jogador)
+	# efeito.top_level = true <-- REMOVIDO
+	
+	# 2. Define a posição RELATIVA ao jogador
+	# Como vamos adicionar como filho do jogador, usamos 'position' e não 'global_position'
+	# Queremos que ele fique exatamente onde está o Marker2D (relativo ao corpo)
+	efeito.position = ponto_efeito_pulo.position
+	
+	# 3. Adiciona COMO FILHO DO JOGADOR (add_child no self)
+	add_child(efeito)
+
 # --- Função chamada pelo Saci ---
 func desbloquear_pulo_duplo():
 	tem_pulo_duplo = true
 	print("PODER RECEBIDO: Pulo Duplo Ativado!")
 
-# ... (Resto das funções criar_bola_de_fogo, levar_dano, etc. continuam iguais) ...
+# ... (Funções de tiro e dano mantidas iguais) ...
 func criar_bola_de_fogo():
 	if not ponto_tiro: return
 	var nova_bola = CENA_BOLA_FOGO.instantiate()
