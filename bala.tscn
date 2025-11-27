@@ -25,11 +25,13 @@ radius = 5.0
 script = ExtResource("1_ag3k0")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(434, 143)
+position = Vector2(222, 68)
+scale = Vector2(0.484375, 0.5097656)
 sprite_frames = SubResource("SpriteFrames_j8aw3")
-frame_progress = 0.69061697
+frame_progress = 0.7012893
 offset = Vector2(-434, -143)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Sprite2D"]
-position = Vector2(-439, -142)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(9.84375, -4.3867188)
+scale = Vector2(0.484375, 0.5097656)
 shape = SubResource("CircleShape2D_f2pop")
