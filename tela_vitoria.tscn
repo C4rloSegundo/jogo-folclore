@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://p6gwq50krwt0"]
+[gd_scene load_steps=3 format=3 uid="uid://p6gwq50krwt0"]
 
-[ext_resource type="Texture2D" uid="uid://bfmmwhvr8pswb" path="res://assets/hud/wmremove-transformed.png" id="1_vetyl"]
+[ext_resource type="Script" uid="uid://bmgpqvjnrn07v" path="res://tela_vitoria.gd" id="1_nsdld"]
+[ext_resource type="Texture2D" uid="uid://cpb3ft0ygymq8" path="res://assets/hud/telafilnal.jpeg" id="2_nsdld"]
 
 [node name="TelaVitoria" type="Control"]
 layout_mode = 3
@@ -9,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_nsdld")
 
 [node name="FundoAmanhecer" type="TextureRect" parent="."]
 layout_mode = 1
@@ -17,7 +19,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("1_vetyl")
+texture = ExtResource("2_nsdld")
 
 [node name="UI_Container" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -50,3 +52,6 @@ theme_override_font_sizes/font_size = 30
 text = "SAIR"
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="."]
+
+[connection signal="pressed" from="UI_Container/BtnMenu" to="." method="_on_btn_menu_pressed"]
+[connection signal="pressed" from="UI_Container/BtnSair" to="." method="_on_btn_sair_pressed"]
