@@ -22,6 +22,7 @@ animations = [{
 radius = 5.0
 
 [node name="Bala" type="Area2D"]
+collision_layer = 0
 script = ExtResource("1_ag3k0")
 
 [node name="Sprite2D" type="AnimatedSprite2D" parent="."]
@@ -35,3 +36,10 @@ offset = Vector2(-434, -143)
 position = Vector2(9.84375, -4.3867188)
 scale = Vector2(0.484375, 0.5097656)
 shape = SubResource("CircleShape2D_f2pop")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(10, -5)
+rect = Rect2(-3, -2, 5, 6)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

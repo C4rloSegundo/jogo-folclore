@@ -238,7 +238,7 @@ autoplay = "parado"
 position = Vector2(-31, -8)
 shape = SubResource("RectangleShape2D_skx2t")
 
-[node name="PontoBraco" type="Marker2D" parent="RoboBoss"]
+[node name="PontoTiro" type="Marker2D" parent="RoboBoss"]
 position = Vector2(8, 4)
 
 [node name="LaserPeito" type="Area2D" parent="RoboBoss"]

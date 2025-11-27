@@ -1,221 +1,172 @@
 extends CharacterBody2D
 
-# --- Configurações Básicas (Herdadas da lógica do Soldado) ---
-@export var speed: float = 20.0 # Mais lento que o soldado
-@export var gravity: float = 10.0
-@export var dano_ataque: int = 1 
+# --- Constantes ---
+const VELOCIDADE_ANDAR: float = 20.0 
+const GRAVIDADE: float = 400.0 
+const INTERVALO_ATAQUES: float = 2.0
 
-# --- Configurações do Boss ---
-@export var intervalo_ataques: float = 2.0 
-var vida: int = 50
-var vida_max: int = 50
+# --- PRELOADS ---
+const CENA_BALA = preload("res://bala.tscn")
 
-# --- Estado ---
-var direction: int = -1 
+# --- Variáveis de Estado ---
+var vida_max: int = 1
+var vida_atual: int = 1
 var is_dead: bool = false
 var is_attacking: bool = false
+
+# --- Variáveis de Poderes ---
+var pode_usar_laser: bool = true 
+
+# --- Variáveis de IA ---
+var timer_cerebro: Timer
 var player_alvo: Node2D = null
-
-# --- Timers ---
-var timer_cerebro: Timer # Substitui o Timer de Patrulha
-
-# --- Projéteis e Cooldown ---
-const CENA_BALA = preload("res://bala.tscn")
-var pode_usar_laser: bool = true
 
 # --- Referências ---
 @onready var sprite: AnimatedSprite2D = $Sprite
-@onready var detector: Area2D = get_node_or_null("Detector") # Opcional no Boss, mas mantive
-@onready var hitbox_dano: Area2D = get_node_or_null("HitboxDano") # Opcional
-
-# Nós Específicos do Boss (Crie estes Markers na cena!)
-@onready var ponto_braco: Marker2D = $PontoBraco
-@onready var laser_peito: Area2D = $LaserPeito
-@onready var visual_laser: ColorRect = $LaserPeito/ColorRect
+@onready var ponto_braco: Marker2D = get_node_or_null("PontoBraco")
+@onready var laser_peito: Area2D = get_node_or_null("LaserPeito")
+@onready var visual_laser: ColorRect = get_node_or_null("LaserPeito/ColorRect")
 
 func _ready():
-	vida = vida_max
-	atualizar_visual()
+	vida_atual = vida_max
+	add_to_group("inimigos")
 	
-	# Se não tiver detector, busca o player globalmente (Comportamento de Boss)
-	if not detector:
-		player_alvo = get_tree().get_first_node_in_group("jogador")
+	player_alvo = get_tree().get_first_node_in_group("jogador")
 	
-	# Garante que o laser começa desligado
-	if laser_peito:
-		laser_peito.monitoring = false
-		visual_laser.visible = false
+	if laser_peito: laser_peito.monitoring = false
+	if visual_laser: visual_laser.visible = false
 	
-	# Timer Cérebro (IA de Decisão)
 	timer_cerebro = Timer.new()
-	timer_cerebro.wait_time = intervalo_ataques
+	timer_cerebro.wait_time = INTERVALO_ATAQUES
 	timer_cerebro.autostart = true
 	timer_cerebro.timeout.connect(_on_timer_cerebro_timeout)
 	add_child(timer_cerebro)
 	
-	# Inicia animação
 	sprite.play("parado")
 
-func _physics_process(delta):
+func _physics_process(delta: float):
 	if is_dead: return
 
-	# Gravidade
 	if not is_on_floor():
-		velocity.y += gravity * delta
+		velocity.y += GRAVIDADE * delta
 
-	# Se estiver atacando, trava movimento
 	if is_attacking:
-		velocity.x = 0
-		move_and_slide()
-		return 
-
-	# --- INTELIGÊNCIA ARTIFICIAL (Perseguição Constante) ---
-	if player_alvo != null:
-		var direcao_player = global_position.direction_to(player_alvo.global_position).x
+		velocity.x = 0 
+	elif player_alvo:
+		var dir_x = global_position.direction_to(player_alvo.global_position).x
+		var direcao = 1 if dir_x > 0 else -1
 		
-		# Define o lado
-		if direcao_player > 0: direction = 1
-		else: direction = -1
-		
-		velocity.x = speed * direction
-		atualizar_visual()
+		velocity.x = direcao * VELOCIDADE_ANDAR
+		virar_boss(direcao)
 	
 	move_and_slide()
 
-func atualizar_visual():
-	if not is_attacking:
-		if direction == 1: 
-			sprite.flip_h = false
-			# Vira os pontos de tiro e laser
-			if ponto_braco: ponto_braco.position.x = abs(ponto_braco.position.x)
-			if laser_peito: laser_peito.scale.x = 1 # Laser para direita (normal)
-		else: 
-			sprite.flip_h = true
-			if ponto_braco: ponto_braco.position.x = -abs(ponto_braco.position.x)
-			if laser_peito: laser_peito.scale.x = -1 # Laser invertido
+func virar_boss(direcao: int):
+	if direcao > 0: # Direita
+		sprite.flip_h = false 
+		if ponto_braco: ponto_braco.position.x = abs(ponto_braco.position.x)
+		if laser_peito: laser_peito.scale.x = 1
+	else: # Esquerda
+		sprite.flip_h = true
+		if ponto_braco: ponto_braco.position.x = -abs(ponto_braco.position.x)
+		if laser_peito: laser_peito.scale.x = -1
 
-# --- CÉREBRO DE ATAQUE (Substitui a patrulha/tiro simples) ---
 func _on_timer_cerebro_timeout():
-	# Verificações de segurança
 	if is_attacking or is_dead or not player_alvo: return
 	
-	# Checagem de distância (aquele código que adicionamos antes)
 	var distancia = global_position.distance_to(player_alvo.global_position)
-	if distancia > 600: # Ajuste a distância conforme quiser
-		return
-	
+	if distancia > 600: return 
+
 	is_attacking = true
 	var sorteio = randi() % 3
 	
 	if sorteio == 0 and pode_usar_laser:
-		# A função do laser já cuida de destravar (is_attacking = false)
-		ataque_laser_peito() 
+		ataque_laser()
 	else:
-		# A função da metralhadora JÁ CUIDA de destravar agora
-		ataque_metralhadora_braco()
-# --- ATAQUE 1: METRALHADORA ---
-func ataque_metralhadora_braco():
-	print("Boss: Rajada de Metralhadora!")
-	
-	# Garante que a animação começa do zero
+		ataque_metralhadora()
+
+# --- ATAQUES ---
+func ataque_metralhadora():
+	print("Boss: Rajada!")
 	sprite.stop()
-	sprite.play("atacando arma") 
+	sprite.play("atacando arma")
 	
-	# Dispara 5 balas
 	for i in range(5):
-		if is_dead: break
-		
-		# --- CORREÇÃO AQUI ---
-		atirar_bala() # <--- Agora chama a função que você já tem!
-		# ---------------------
-		
-		# Tempo entre cada tiro (tra-ta-ta-ta)
+		if is_dead: return 
+		atirar_bala()
 		await get_tree().create_timer(0.2).timeout
 	
-	# Espera um tempinho extra após os tiros para ele "baixar a arma"
 	await get_tree().create_timer(0.5).timeout
+	if is_dead: return 
 	
-	# Destrava o robô manualmente para ele não travar
-	print("Boss: Fim da rajada, destravando...")
 	is_attacking = false
 	sprite.play("parado")
-	
+
 func atirar_bala():
-	var tiro = CENA_BALA.instantiate()
+	if not ponto_braco or not CENA_BALA: return
 	
-	# 1. Define onde nasce (PontoBraco)
+	var tiro = CENA_BALA.instantiate()
 	tiro.global_position = ponto_braco.global_position
 	
-	# 2. CALCULA A MIRA (A parte importante)
 	if player_alvo:
-		# Cria um vetor que aponta do Braço -> para o Jogador
-		var direcao_mira = ponto_braco.global_position.direction_to(player_alvo.global_position)
-		tiro.direcao = direcao_mira
-		
-		# (Opcional) Faz a bala GIRAR visualmente para apontar para o jogador
-		tiro.rotation = direcao_mira.angle()
-	else:
-		# Se não tiver alvo, atira reto na direção que o boss está olhando
-		tiro.direcao = Vector2.RIGHT if direction == 1 else Vector2.LEFT
+		tiro.direcao = (player_alvo.global_position - ponto_braco.global_position).normalized()
 	
-	# 3. Solta a bala no mundo
 	get_parent().add_child(tiro)
-# --- ATAQUE 2: LASER (Hit Kill) ---
-func ataque_laser_peito():
-	print("Boss: CARREGANDO LASER!")
+
+func ataque_laser():
+	print("Boss: LASER!")
 	pode_usar_laser = false
 	recuperar_laser_10s()
 	
+	sprite.stop()
 	sprite.play("atacando missel")
-	modulate = Color(3, 0, 0) 
+	modulate = Color(3, 0, 0)
 	
-	# Tempo carregando
-	await get_tree().create_timer(1.5).timeout 
+	await get_tree().create_timer(1.5).timeout
+	if is_dead: return 
 	
-	print("Boss: DISPARO!")
 	modulate = Color(1, 1, 1)
-	visual_laser.visible = true
-	laser_peito.monitoring = true
+	if visual_laser: visual_laser.visible = true
+	if laser_peito: laser_peito.monitoring = true
 	
-	# Dano
-	var corpos = laser_peito.get_overlapping_bodies()
-	for corpo in corpos:
-		if corpo.is_in_group("jogador") and corpo.has_method("levar_dano"):
-			corpo.levar_dano(999)
+	if laser_peito:
+		var corpos = laser_peito.get_overlapping_bodies()
+		for corpo in corpos:
+			if corpo.is_in_group("jogador") and corpo.has_method("levar_dano"):
+				corpo.levar_dano(999)
 	
-	# Duração do Laser ligado
 	await get_tree().create_timer(0.5).timeout
+	if is_dead: return 
 	
-	visual_laser.visible = false
-	laser_peito.monitoring = false
+	if visual_laser: visual_laser.visible = false
+	if laser_peito: laser_peito.monitoring = false
 	
-	# --- MUDANÇA AQUI ---
-	# Em vez de esperar a animação (que pode travar), esperamos um tempinho extra
-	# e forçamos o robô a voltar ao normal.
 	await get_tree().create_timer(0.5).timeout
+	if is_dead: return 
 	
-	# Destrava o ataque manualmente
 	is_attacking = false
 	sprite.play("parado")
+
 func recuperar_laser_10s():
 	await get_tree().create_timer(10.0).timeout
 	pode_usar_laser = true
+	print("Boss: Laser pronto!")
 
-# --- COMBATE (Dano e Morte) ---
+# --- COMBATE E MORTE ---
 func levar_dano(dano: int):
 	if is_dead: return
-	vida -= dano
-	
-	# Pisca vermelho
+	vida_atual -= dano
 	modulate = Color(10, 0, 0)
 	await get_tree().create_timer(0.1).timeout
 	modulate = Color(1, 1, 1)
-	
-	if vida <= 0: morrer()
+	if vida_atual <= 0: morrer()
 
 func morrer():
 	if is_dead: return
+	
+	print("BOSS: Iniciando morte...")
 	is_dead = true
+	
 	timer_cerebro.stop()
 	velocity = Vector2.ZERO
 	
@@ -223,17 +174,23 @@ func morrer():
 	if laser_peito: laser_peito.set_deferred("monitoring", false)
 	if visual_laser: visual_laser.visible = false
 	
+	sprite.stop()
 	sprite.play("morrendo")
+	
+	# Lembre-se de tirar o Loop da animação no editor!
 	await sprite.animation_finished
 	
-	await get_tree().create_timer(1.0).timeout
+	print("BOSS: Destruído. Aguardando 5s...")
+	await get_tree().create_timer(5.0).timeout
 	
-	# Vitória
-	var hud = get_tree().current_scene.get_node_or_null("HUD")
-	if hud: Global.tempo_da_partida = hud.parar_e_pegar_tempo()
-	get_tree().change_scene_to_file("res://TelaVitoria.tscn")
-
-# --- DETECÇÃO (Herdado do soldado, caso use Area2D Detector) ---
-func _on_detector_body_entered(body):
-	if body.is_in_group("jogador"):
-		player_alvo = body
+	# --- AJUSTADO PARA NOMES MINÚSCULOS AQUI ---
+	var hud = get_tree().current_scene.get_node_or_null("hud") # "hud" minúsculo
+	
+	if hud and Global:
+		Global.tempo_da_partida = hud.parar_e_pegar_tempo()
+		print("Tempo salvo!")
+	else:
+		print("AVISO: 'hud' (minúsculo) não encontrado ou Global ausente.")
+	
+	# Caminho exato do arquivo
+	get_tree().change_scene_to_file("res://tela_vitoria.tscn")
