@@ -1,0 +1,50 @@
+[gd_scene load_steps=8 format=3 uid="uid://d04mpjfk4kmlk"]
+
+[ext_resource type="Script" uid="uid://dvw0l2q7bhwa0" path="res://escudo_fogo.gd" id="1_8266s"]
+[ext_resource type="Texture2D" uid="uid://bg8nyuruy61hr" path="res://assets/poderes/Yellow Effect Bullet Impact Explosion 32x32.png" id="2_0g5n3"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sbw60"]
+atlas = ExtResource("2_0g5n3")
+region = Rect2(288, 448, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mdajg"]
+atlas = ExtResource("2_0g5n3")
+region = Rect2(256, 448, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o2jh5"]
+atlas = ExtResource("2_0g5n3")
+region = Rect2(224, 448, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w3xgd"]
+atlas = ExtResource("2_0g5n3")
+region = Rect2(192, 448, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1xcka"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sbw60")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_mdajg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o2jh5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w3xgd")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="EscudoFogo" type="Node2D"]
+script = ExtResource("1_8266s")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(40, 0)
+rotation = 1.5707964
+sprite_frames = SubResource("SpriteFrames_1xcka")
+autoplay = "default"
+frame_progress = 0.9650256

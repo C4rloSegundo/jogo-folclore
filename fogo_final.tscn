@@ -1,0 +1,61 @@
+[gd_scene load_steps=9 format=3 uid="uid://btdywujguo31h"]
+
+[ext_resource type="Script" uid="uid://byyxupuvos3hf" path="res://bola_de_fogo.gd" id="1_hcmf8"]
+[ext_resource type="Texture2D" uid="uid://bg8nyuruy61hr" path="res://assets/poderes/Yellow Effect Bullet Impact Explosion 32x32.png" id="3_lr7x8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8577p"]
+atlas = ExtResource("3_lr7x8")
+region = Rect2(448, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gbhpo"]
+atlas = ExtResource("3_lr7x8")
+region = Rect2(416, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f223o"]
+atlas = ExtResource("3_lr7x8")
+region = Rect2(384, 160, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rlppg"]
+atlas = ExtResource("3_lr7x8")
+region = Rect2(352, 160, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_6n15b"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8577p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gbhpo")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f223o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rlppg")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fornr"]
+size = Vector2(31, 7)
+
+[node name="BolaDeFogo" type="Area2D"]
+z_index = 10
+rotation = -3.1415927
+script = ExtResource("1_hcmf8")
+dano = 3
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_6n15b")
+autoplay = "default"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_fornr")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

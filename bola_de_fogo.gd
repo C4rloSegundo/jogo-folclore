@@ -1,48 +1,54 @@
 extends Area2D
 
-# Configurações da Bola
 @export var velocidade: float = 400.0
 @export var dano: int = 1
-var direcao: int = 1 # 1 = Direita, -1 = Esquerda
+var direcao: int = 1 
 
-# Referência automática ao nó de animação
 @onready var anim: AnimatedSprite2D = $AnimatedSprite2D
 
 func _ready():
-	print("FOGO: Nasci na posição ", global_position) # <-- ADICIONA ISTO
-	# 1. Toca a animação assim que nasce
 	if anim:
-		anim.play("default")
-	
-	# 2. Se a bola for para a esquerda, roda o desenho 180 graus
-	if direcao == -1:
-		rotation_degrees = 180 
+		# Toca a animação padrão se nenhuma outra foi definida antes
+		if anim.animation == "default":
+			anim.play("default")
+		
+		atualizar_visual()
+	else:
+		print("ERRO: Nó 'AnimatedSprite2D' não encontrado na Bola de Fogo!")
 
 func _process(delta):
-	# Move a bola para a frente
 	position.x += velocidade * direcao * delta
+	atualizar_visual()
 
-# Quando a bola bate em algo
+func atualizar_visual():
+	if not anim: return
+	
+	# Espelha o sprite se for para a esquerda
+	if direcao == -1:
+		anim.scale.x = -1
+	else:
+		anim.scale.x = 1
+
+# --- FUNÇÃO PARA ATIVAR O PODER (ATUALIZADA PARA 'fogo_final') ---
+# No bola_de_fogo.gd
+
+func ativar_poder():
+	dano = 3
+	if anim:
+		# Confirme se o nome aqui é EXATAMENTE igual ao que criou no SpriteFrames
+		if anim.sprite_frames.has_animation("fogo_final"):
+			anim.play("fogo_final")
+		else:
+			print("ERRO: Animação 'fogo_final' não existe!")
+
 func _on_body_entered(body):
-	# Ignora o jogador
-	if body.is_in_group("jogador"):
-		return
-	# ADICIONA ISTO PARA SABER NO QUE BATEU
-	print("FOGO: Bati em ", body.name, "kk e vou morrer.")
-	# Se for Inimigo, dá dano
+	if body.is_in_group("jogador"): return
+	
 	if body.has_method("levar_dano"):
 		body.levar_dano(dano)
-		queue_free() # Destrói a bola
-	
-	# Se for Parede/Chão
+		queue_free()
 	elif body is TileMap or body is TileMapLayer:
-		queue_free() # Destrói a bola
+		queue_free()
 
-# Quando a bola sai da tela (limpeza)
 func _on_visible_on_screen_notifier_2d_screen_exited():
-	print("FOGO: Sai da tela. Tchau.") # <-- ADICIONA ISTO
 	queue_free()
-
-
-func _on_visible_on_screen_enabler_2d_screen_exited() -> void:
-	pass # Replace with function body.

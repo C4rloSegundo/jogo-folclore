@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://b5nl8qhpdnjn8"]
+[gd_scene load_steps=17 format=3 uid="uid://b5nl8qhpdnjn8"]
 
 [ext_resource type="Script" uid="uid://fhk3w0yjmyn8" path="res://demofloresta.gd" id="1_euhhy"]
 [ext_resource type="Texture2D" uid="uid://bifdgnfwt2ard" path="res://assets/cenario/cenario2d2.png" id="2_le635"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://crhbn457e4ea2" path="res://espinho.tscn" id="8_orw4n"]
 [ext_resource type="PackedScene" uid="uid://b0or6hhmij06l" path="res://checkpoint.tscn" id="9_d34sx"]
 [ext_resource type="PackedScene" uid="uid://c25g8n8ej5t6j" path="res://saci_preso.tscn" id="10_plmph"]
+[ext_resource type="PackedScene" uid="uid://dkg6stet6kts3" path="res://curupira_preso.tscn" id="11_pchxr"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_b676b"]
 
@@ -990,6 +991,9 @@ scale = Vector2(0.5977145, 0.41857037)
 position = Vector2(3188, 267.00003)
 rotation = 0.0034905903
 scale = Vector2(0.5977145, 0.41857037)
+
+[node name="curupira_preso" parent="." instance=ExtResource("11_pchxr")]
+position = Vector2(544, 269)
 
 [connection signal="saude_mudou" from="personagem/curumin" to="hud/ContainerCoracoes" method="_on_curumin_saude_mudou"]
 [connection signal="body_entered" from="ZonaDeMorte" to="." method="_on_zona_de_morte_body_entered"]
