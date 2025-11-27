@@ -164,7 +164,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_3d2wm")
 }],
-"loop": true,
+"loop": false,
 "name": &"atacando missel",
 "speed": 5.0
 }, {
@@ -199,7 +199,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_cm1kr")
 }],
-"loop": true,
+"loop": false,
 "name": &"morrendo",
 "speed": 5.0
 }, {
@@ -231,17 +231,20 @@ script = ExtResource("1_6xxrv")
 position = Vector2(-33, -22)
 scale = Vector2(1.025, 1.0104166)
 sprite_frames = SubResource("SpriteFrames_xvkcc")
-animation = &"atacando arma"
+animation = &"morrendo"
+autoplay = "parado"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RoboBoss"]
 visible = false
 position = Vector2(-32, -5)
 shape = SubResource("CircleShape2D_oehbi")
 
-[node name="PontoDeTiro" type="Marker2D" parent="RoboBoss"]
+[node name="PontoBraco" type="Marker2D" parent="RoboBoss"]
 position = Vector2(-52, 1)
 
 [node name="LaserPeito" type="Area2D" parent="RoboBoss"]
+monitoring = false
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RoboBoss/LaserPeito"]
 position = Vector2(126, -16)
