@@ -1,8 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://t0jodcsay6t8"]
+[gd_scene load_steps=16 format=3 uid="uid://t0jodcsay6t8"]
 
 [ext_resource type="Script" uid="uid://6nh585es5i3t" path="res://curumin.gd" id="1_k0c8s"]
 [ext_resource type="Texture2D" uid="uid://ngtaujgynmd1" path="res://assets/personagem/curumin-removebg-preview.png" id="2_s3elh"]
 [ext_resource type="Texture2D" uid="uid://ckj0gd401xj77" path="res://assets/personagem/curumim_atacando-removebg-preview.png" id="3_114o1"]
+[ext_resource type="AudioStream" uid="uid://dbcdw68p126sd" path="res://sounds/jump.wav" id="4_114o1"]
+[ext_resource type="AudioStream" uid="uid://c4rr8d7sle5q3" path="res://sounds/hurt.wav" id="5_gn376"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_nvt02"]
 atlas = ExtResource("2_s3elh")
@@ -130,6 +132,12 @@ position = Vector2(14, 44)
 
 [node name="PontoEscudo" type="Marker2D" parent="curumin"]
 position = Vector2(31, 20)
+
+[node name="SfxPulo" type="AudioStreamPlayer2D" parent="curumin"]
+stream = ExtResource("4_114o1")
+
+[node name="SfxDano" type="AudioStreamPlayer2D" parent="curumin"]
+stream = ExtResource("5_gn376")
 
 [connection signal="body_entered" from="curumin/Hitboxataque" to="curumin" method="_on_hitbox_ataque_area_entered"]
 [connection signal="timeout" from="curumin/TimerInvencibilidade" to="curumin" method="_on_timer_invencibilidade_timeout"]
